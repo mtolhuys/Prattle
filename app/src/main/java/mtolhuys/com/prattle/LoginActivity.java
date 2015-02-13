@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.parse.LogInCallback;
@@ -23,6 +25,7 @@ public class LoginActivity extends ActionBarActivity {
     protected EditText mPassword;
     protected Button mLoginButton;
     protected Button mSignUptButton;
+    protected ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,9 @@ public class LoginActivity extends ActionBarActivity {
         mUsername = (EditText) findViewById(R.id.usernameField);
         mPassword = (EditText) findViewById(R.id.passwordField);
         mLoginButton = (Button) findViewById(R.id.loginButton);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        mProgressBar.setVisibility(View.INVISIBLE);
 
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,9 +66,15 @@ public class LoginActivity extends ActionBarActivity {
                     AlertDialog dialog = builder.create();
                     dialog.show();
                 } else {
+
+                    mProgressBar.setVisibility(View.VISIBLE);
+
                     ParseUser.logInInBackground(username, password, new LogInCallback() {
                         @Override
                         public void done(ParseUser user, ParseException e) {
+
+                            mProgressBar.setVisibility(View.INVISIBLE);
+
                             if (e == null) {
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
