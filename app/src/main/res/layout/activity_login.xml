@@ -14,9 +14,8 @@
         android:id="@+id/usernameField"
         android:longClickable="false"
         android:hint="@string/username_hint"
-        android:layout_above="@+id/passwordField"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="60dp"
         android:layout_marginBottom="@dimen/login_signup_fields"/>
 
     <requestFocus />
@@ -28,10 +27,8 @@
         android:ems="10"
         android:id="@+id/passwordField"
         android:hint="@string/password_hint"
-        android:layout_above="@+id/login_signup_buttons"
-        android:layout_marginBottom="@dimen/login_signup_fields"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
+        android:layout_below="@+id/usernameField"
+        android:layout_marginTop="@dimen/login_signup_fields"/>
 
     <LinearLayout
         android:orientation="horizontal"
