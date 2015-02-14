@@ -20,7 +20,8 @@
     <string name="login_error_title">Oops!</string>
     <string name="action_logout_label">Logout</string>
     <string name="inbox">Inbox</string>
-    <string name="friends">Friends</string>
-    <string name="no_new_messages">No new messages!</string>
+    <string name="friends">Contacts</string>
+    <string name="no_messages">No new messages!</string>
+    <string name="no_contacts">Add contacts to begin!</string>
 
 </resources>

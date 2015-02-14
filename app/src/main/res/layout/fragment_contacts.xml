@@ -16,6 +16,6 @@
         android:id="@android:id/empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/no_messages"/>
+        android:text="@string/no_contacts"/>
     
 </RelativeLayout>
