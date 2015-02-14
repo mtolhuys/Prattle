@@ -109,6 +109,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             ParseUser.logOut();
             goToLogin();
             return true;
+        } else if (id == R.id.action_edit_contacts) {
+            Intent intent = new Intent(this, EditContactsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

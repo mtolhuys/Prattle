@@ -23,5 +23,8 @@
     <string name="friends">Contacts</string>
     <string name="no_messages">No new messages!</string>
     <string name="no_contacts">Add contacts to begin!</string>
+    <string name="menu_edit_contacts">Edit Contacts</string>
+    <string name="title_activity_edit_contacts">Edit Contacts</string>
+    <string name="error_title">We\'re Sorry!</string>
 
 </resources>
