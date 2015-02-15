@@ -1,5 +1,7 @@
 package mtolhuys.com.prattle;
 
+import com.parse.ParseUser;
+
 /**
  * Created by mtolhuys on 14/02/15.
  */

@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--APP STRINGS-->
     <string name="app_name">Prattle</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="username_hint">Username</string>
@@ -14,17 +11,20 @@
     <string name="title_activity_sign_up">SignUpActivity</string>
     <string name="email_hint">Email</string>
     <string name="signup_button_label">Sign Up</string>
-    <string name="signup_error_message">Please make sure you enter a username, password and email address!</string>
-    <string name="signup_error_title">Oops!</string>
-    <string name="login_error_message">Please make sure you enter a username and password!</string>
-    <string name="login_error_title">Oops!</string>
     <string name="action_logout_label">Logout</string>
     <string name="inbox">Inbox</string>
     <string name="friends">Contacts</string>
     <string name="no_messages">No new messages!</string>
     <string name="no_contacts">Add contacts to begin!</string>
-    <string name="menu_edit_contacts">Edit Contacts</string>
-    <string name="title_activity_edit_contacts">Edit Contacts</string>
-    <string name="error_title">We\'re Sorry!</string>
+    <string name="search_contacts">Search Contacts</string>
+
+    <!--ALERTDIALOGS-->
+    <string name="oops_title">Oops!</string>
+    <string name="sorry_title">We\'re Sorry!</string>
+    <string name="search_no_result_message">We didn\'t find anybody with that username. Please try again!</string>
+    <string name="search_same_as_user">Search item same as current username</string>
+    <string name="signup_error_message">Please make sure you enter a username, password and email address!</string>
+    <string name="login_error_message">Please make sure you enter a username and password!</string>
+    <string name="menu_delete_account">Delete Account</string>
 
 </resources>

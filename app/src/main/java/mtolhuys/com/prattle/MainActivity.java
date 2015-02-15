@@ -12,12 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.parse.ParseAnalytics;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
+    protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -41,11 +43,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         ParseAnalytics.trackAppOpened(getIntent());
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser == null) {
+        if (mCurrentUser == null) {
             goToLogin();
         } else {
-            Log.i(TAG, currentUser.getUsername());
+            Log.i(TAG, mCurrentUser.getUsername());
         }
 
         // Set up the action bar.
@@ -109,9 +110,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             ParseUser.logOut();
             goToLogin();
             return true;
-        } else if (id == R.id.action_edit_contacts) {
+        }
+        else if (id == R.id.action_edit_contacts) {
             Intent intent = new Intent(this, EditContactsActivity.class);
             startActivity(intent);
+        }
+        else if (id == R.id.action_delete_account) {
+            mCurrentUser.deleteInBackground();
+            ParseUser.logOut();
+            goToLogin();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

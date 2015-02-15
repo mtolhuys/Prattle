@@ -58,7 +58,7 @@ public class LoginActivity extends ActionBarActivity {
 
                 if (username.isEmpty() || password.isEmpty()) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                    builder.setTitle(getString(R.string.login_error_title))
+                    builder.setTitle(getString(R.string.oops_title))
                             .setMessage(getString(R.string.login_error_message))
                             .setPositiveButton(android.R.string.ok, null);
                     AlertDialog dialog = builder.create();
@@ -80,7 +80,7 @@ public class LoginActivity extends ActionBarActivity {
                                 startActivity(intent);
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                builder.setTitle(getString(R.string.login_error_title))
+                                builder.setTitle(getString(R.string.oops_title))
                                         .setMessage(e.getMessage())
                                         .setPositiveButton(android.R.string.ok, null);
                                 AlertDialog dialog = builder.create();

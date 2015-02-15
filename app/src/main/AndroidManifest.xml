@@ -34,7 +34,7 @@
         </activity>
         <activity
             android:name=".EditContactsActivity"
-            android:label="@string/title_activity_edit_contacts"
+            android:label="@string/search_contacts"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" >
             <meta-data

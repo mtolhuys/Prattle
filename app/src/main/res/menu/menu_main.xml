@@ -9,7 +9,10 @@
           app:showAsAction="never"/>
 
     <item android:id="@+id/action_edit_contacts"
-          android:title="@string/menu_edit_contacts"/>
+          android:title="@string/search_contacts"/>
+
+    <item android:id="@+id/action_delete_account"
+          android:title="@string/menu_delete_account"/>
 
 </menu>
 

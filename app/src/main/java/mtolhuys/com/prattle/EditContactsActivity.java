@@ -2,14 +2,18 @@ package mtolhuys.com.prattle;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -22,9 +26,13 @@ import java.util.List;
 public class EditContactsActivity extends ListActivity {
 
     public static final String TAG = EditContactsActivity.class.getSimpleName();
+    protected String mCurrentUser = ParseUser.getCurrentUser().getUsername();
 
     protected List<ParseUser> mUsers;
     protected ProgressBar mProgressBar;
+    protected EditText mSearchField;
+    protected TextView mNoResult;
+    protected ImageButton mSearchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,50 +40,68 @@ public class EditContactsActivity extends ListActivity {
         setContentView(R.layout.activity_edit_contacts);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mNoResult = (TextView) findViewById(R.id.noResultLabel);
 
         mProgressBar.setVisibility(View.INVISIBLE);
+        mNoResult.setVisibility(View.INVISIBLE);
     }
 
     @Override
     protected void onResume() {
 
-        mProgressBar.setVisibility(View.VISIBLE);
-
         super.onResume();
 
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.orderByAscending(ParseConstants.KEY_USERNAME);
-        query.setLimit(1000);
-        query.findInBackground(new FindCallback<ParseUser>() {
+        mSearchField = (EditText) findViewById(R.id.searchUser);
+        mSearchButton = (ImageButton) findViewById(R.id.searchButton);
+
+        mSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void done(List<ParseUser> users, ParseException e) {
+            public void onClick(View v) {
 
-                mProgressBar.setVisibility(View.INVISIBLE);
+                mProgressBar.setVisibility(View.VISIBLE);
+                mNoResult.setVisibility(View.INVISIBLE);
 
-                if (e == null) {
-                    mUsers = users;
-                    String[] usernames = new String[mUsers.size()];
-                    int i = 0;
-                    for (ParseUser user : mUsers) {
-                        usernames[i] = user.getUsername();
-                        i++;
+                final String searchItem = mSearchField.getText().toString();
+
+                final ParseQuery<ParseUser> query = ParseUser.getQuery();
+                query.orderByAscending(ParseConstants.KEY_USERNAME);
+                query.setLimit(1000);
+                query.whereContains(ParseConstants.KEY_USERNAME, searchItem);
+                query.whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUser);
+                query.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(List<ParseUser> users, ParseException e) {
+
+                        mProgressBar.setVisibility(View.INVISIBLE);
+
+                        if (searchItem.equals(mCurrentUser)) {
+                            sameAsSearchItemAlert();
+                            setListAdapter(null);
+                        } else if (users.isEmpty()) {
+                            mNoResult.setVisibility(View.VISIBLE);
+                            setListAdapter(null);
+                        } else if (e == null) {
+                            mUsers = users;
+                            String[] usernames = new String[mUsers.size()];
+                            int i = 0;
+                            for (ParseUser user : mUsers) {
+                                usernames[i] = user.getUsername();
+                                i++;
+                            }
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                    EditContactsActivity.this,
+                                    android.R.layout.simple_list_item_checked,
+                                    usernames);
+                            setListAdapter(adapter);
+                        } else {
+                            Log.e(TAG, e.getMessage());
+                            exceptionErrorAlert(e);
+                        }
                     }
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                            EditContactsActivity.this,
-                            android.R.layout.simple_list_item_checked,
-                            usernames);
-                    setListAdapter(adapter);
-                } else {
-                    Log.e(TAG, e.getMessage());
-                    AlertDialog.Builder builder = new AlertDialog.Builder(EditContactsActivity.this);
-                    builder.setTitle(getString(R.string.error_title))
-                            .setMessage(e.getMessage())
-                            .setPositiveButton(android.R.string.ok, null);
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
+                });
             }
         });
+
     }
 
     @Override
@@ -98,5 +124,32 @@ public class EditContactsActivity extends ListActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sameAsSearchItemAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.search_same_as_user))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void noSearchResultAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.sorry_title))
+                .setMessage(getString(R.string.search_no_result_message))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void exceptionErrorAlert(ParseException e) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(e.getMessage())
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
