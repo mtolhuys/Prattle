@@ -28,5 +28,6 @@
     <string name="menu_delete_account">Delete Account</string>
     <string name="caution_title">Caution!</string>
     <string name="search_same_as_user">Search item is the same as current username</string>
+    <string name="delete_success">Account successfully deleted!</string>
 
 </resources>

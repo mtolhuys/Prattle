@@ -128,7 +128,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                             // current activity
                             mCurrentUser.deleteInBackground();
                             ParseUser.logOut();
-                            Toast.makeText(MainActivity.this, "Account succesfully deleted!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, getString(R.string.delete_success), Toast.LENGTH_LONG).show();
                             goToLogin();
                         }
                     })
