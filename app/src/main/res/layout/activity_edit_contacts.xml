@@ -2,7 +2,8 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context="mtolhuys.com.prattle.EditContactsActivity">
+                tools:context="mtolhuys.com.prattle.EditContactsActivity"
+                android:background="#ffffff">
 
     <ListView
         android:layout_width="match_parent"
@@ -24,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:hint="Search Usernames"
+        android:hint="Search (Case Sensitive)"
         android:ems="10"
         android:id="@+id/searchUser"
         android:layout_alignParentTop="true"
@@ -35,9 +36,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/searchButton"
+        android:src="@drawable/ic_action_search"
+        android:background="#ffffff"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/ic_action_search"
         android:layout_above="@android:id/list"/>
 
     <TextView

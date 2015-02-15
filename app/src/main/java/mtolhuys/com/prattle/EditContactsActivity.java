@@ -3,7 +3,6 @@ package mtolhuys.com.prattle;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +12,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -65,7 +63,7 @@ public class EditContactsActivity extends ListActivity {
 
                 final ParseQuery<ParseUser> query = ParseUser.getQuery();
                 query.orderByAscending(ParseConstants.KEY_USERNAME);
-                query.setLimit(1000);
+                query.setLimit(100);
                 query.whereContains(ParseConstants.KEY_USERNAME, searchItem);
                 query.whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUser);
                 query.findInBackground(new FindCallback<ParseUser>() {
@@ -74,7 +72,10 @@ public class EditContactsActivity extends ListActivity {
 
                         mProgressBar.setVisibility(View.INVISIBLE);
 
-                        if (searchItem.equals(mCurrentUser)) {
+                        if (searchItem.isEmpty()) {
+                            noSearchItemAlert();
+                        }
+                        else if (searchItem.equals(mCurrentUser)) {
                             sameAsSearchItemAlert();
                             setListAdapter(null);
                         } else if (users.isEmpty()) {
@@ -135,10 +136,10 @@ public class EditContactsActivity extends ListActivity {
         dialog.show();
     }
 
-    private void noSearchResultAlert() {
+    private void noSearchItemAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.sorry_title))
-                .setMessage(getString(R.string.search_no_result_message))
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.search_no_item_message))
                 .setPositiveButton(android.R.string.ok, null);
         AlertDialog dialog = builder.create();
         dialog.show();

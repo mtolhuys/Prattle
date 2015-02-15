@@ -1,5 +1,7 @@
 package mtolhuys.com.prattle;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -10,9 +12,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 
@@ -116,9 +118,29 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             startActivity(intent);
         }
         else if (id == R.id.action_delete_account) {
-            mCurrentUser.deleteInBackground();
-            ParseUser.logOut();
-            goToLogin();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.caution_title))
+                    .setMessage(getString(R.string.delete_confirmation))
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // if this button is clicked, close
+                            // current activity
+                            mCurrentUser.deleteInBackground();
+                            ParseUser.logOut();
+                            Toast.makeText(MainActivity.this, "Account succesfully deleted!", Toast.LENGTH_LONG).show();
+                            goToLogin();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // if this button is clicked, just close
+                            // the dialog box and do nothing
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
             return true;
         }
 

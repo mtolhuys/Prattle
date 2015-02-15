@@ -21,10 +21,12 @@
     <!--ALERTDIALOGS-->
     <string name="oops_title">Oops!</string>
     <string name="sorry_title">We\'re Sorry!</string>
-    <string name="search_no_result_message">We didn\'t find anybody with that username. Please try again!</string>
-    <string name="search_same_as_user">Search item same as current username</string>
+    <string name="search_no_item_message">Please enter a username</string>
+    <string name="delete_confirmation">Are you sure you want to delete your account?</string>
     <string name="signup_error_message">Please make sure you enter a username, password and email address!</string>
     <string name="login_error_message">Please make sure you enter a username and password!</string>
     <string name="menu_delete_account">Delete Account</string>
+    <string name="caution_title">Caution!</string>
+    <string name="search_same_as_user">Search item is the same as current username</string>
 
 </resources>
