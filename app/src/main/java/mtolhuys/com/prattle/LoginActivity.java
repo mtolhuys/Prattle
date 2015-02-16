@@ -1,13 +1,13 @@
 package mtolhuys.com.prattle;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -15,6 +15,9 @@ import android.widget.ProgressBar;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -28,6 +31,10 @@ public class LoginActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath(getString(R.string.font_family))
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         setContentView(R.layout.activity_login);
 
         mSignUptButton = (Button) findViewById(R.id.signUpText);
@@ -58,17 +65,13 @@ public class LoginActivity extends ActionBarActivity {
 
                 if (username.isEmpty()) {
                     signupNameAlert();
-                }
-                else if (username.contains(" ")) {
+                } else if (username.contains(" ")) {
                     signupNameLengthAlert();
-                }
-                else if (password.isEmpty()) {
+                } else if (password.isEmpty()) {
                     signupPasswordAlert();
-                }
-                else if (username.isEmpty() || password.isEmpty() || username.contains(" ")) {
+                } else if (username.isEmpty() || password.isEmpty() || username.contains(" ")) {
                     signupOverallAlert();
-                }
-                else {
+                } else {
 
                     mProgressBar.setVisibility(View.VISIBLE);
 
@@ -98,6 +101,10 @@ public class LoginActivity extends ActionBarActivity {
         });
     }
 
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

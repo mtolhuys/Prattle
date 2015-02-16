@@ -1,6 +1,7 @@
 package mtolhuys.com.prattle;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +19,9 @@ import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
@@ -44,6 +48,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath(getString(R.string.font_family))
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         setContentView(R.layout.activity_main);
 
         ParseAnalytics.trackAppOpened(getIntent());
@@ -86,6 +94,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     private void goToLogin() {

@@ -28,6 +28,9 @@ import com.parse.SaveCallback;
 
 import java.util.List;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 
 public class EditContactsActivity extends ListActivity {
 
@@ -48,6 +51,10 @@ public class EditContactsActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath(getString(R.string.font_family))
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         setContentView(R.layout.activity_edit_contacts);
 
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -122,6 +129,11 @@ public class EditContactsActivity extends ListActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     @Override

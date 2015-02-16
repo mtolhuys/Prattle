@@ -1,6 +1,7 @@
 package mtolhuys.com.prattle;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -15,6 +16,9 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 
 public class SignUpActivity extends ActionBarActivity {
 
@@ -27,6 +31,10 @@ public class SignUpActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath(getString(R.string.font_family))
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         setContentView(R.layout.activity_sign_up);
 
         mUsername = (EditText) findViewById(R.id.usernameField);
@@ -50,21 +58,16 @@ public class SignUpActivity extends ActionBarActivity {
 
                 if (username.isEmpty()) {
                     signupNameAlert();
-                }
-                else if (email.isEmpty()) {
+                } else if (email.isEmpty()) {
                     signupMailAlert();
-                }
-                else if (username.contains(" ")) {
+                } else if (username.contains(" ")) {
                     signupNameLengthAlert();
-                }
-                else if (password.isEmpty()) {
+                } else if (password.isEmpty()) {
                     signupPasswordAlert();
-                }
-                else if (username.isEmpty() || email.isEmpty() ||
+                } else if (username.isEmpty() || email.isEmpty() ||
                         password.isEmpty() || username.contains(" ")) {
                     signupOverallAlert();
-                }
-                else {
+                } else {
                     mProgressBar.setVisibility(View.VISIBLE);
 
                     ParseUser newUser = new ParseUser();
@@ -98,12 +101,16 @@ public class SignUpActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_sign_up, menu);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

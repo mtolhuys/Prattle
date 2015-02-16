@@ -4,11 +4,11 @@
     <!--APP STRINGS-->
     <string name="app_name">Prattle</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_sign_up">Sign Up</string>
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
     <string name="login_button_label">Login</string>
-    <string name="title_activity_sign_up">SignUpActivity</string>
     <string name="email_hint">Email</string>
     <string name="signup_button_label">Sign Up</string>
     <string name="action_logout_label">Logout</string>
@@ -38,5 +38,6 @@
     <string name="signup_email_message">Be sure to give a e-mail address!</string>
     <string name="signup_name_message">Be sure to give a username!</string>
     <string name="update_contacts">Update Contacts</string>
+    <string name="font_family">fonts/Ubuntu-L.ttf</string>
 
 </resources>
