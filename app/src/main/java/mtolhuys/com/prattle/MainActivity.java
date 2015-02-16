@@ -12,6 +12,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
@@ -21,6 +23,7 @@ import com.parse.ParseUser;
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
+
     protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
 
     /**

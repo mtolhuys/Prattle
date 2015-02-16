@@ -53,17 +53,22 @@ public class LoginActivity extends ActionBarActivity {
                 String username = mUsername.getText().toString();
                 String password = mPassword.getText().toString();
 
-                username = username.trim();
-                password = password.trim();
+                username.trim();
+                password.trim();
 
-                if (username.isEmpty() || password.isEmpty()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                    builder.setTitle(getString(R.string.oops_title))
-                            .setMessage(getString(R.string.login_error_message))
-                            .setPositiveButton(android.R.string.ok, null);
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                } else {
+                if (username.isEmpty()) {
+                    signupNameAlert();
+                }
+                else if (username.contains(" ")) {
+                    signupNameLengthAlert();
+                }
+                else if (password.isEmpty()) {
+                    signupPasswordAlert();
+                }
+                else if (username.isEmpty() || password.isEmpty() || username.contains(" ")) {
+                    signupOverallAlert();
+                }
+                else {
 
                     mProgressBar.setVisibility(View.VISIBLE);
 
@@ -114,5 +119,41 @@ public class LoginActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void signupOverallAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.signup_error_message))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void signupPasswordAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.signup_password_error))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void signupNameLengthAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.signup_username_error))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void signupNameAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.signup_name_message))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

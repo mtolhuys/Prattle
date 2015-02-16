@@ -17,17 +17,26 @@
     <string name="no_messages">No new messages!</string>
     <string name="no_contacts">Add contacts to begin!</string>
     <string name="search_contacts">Search Contacts</string>
+    <string name="menu_delete_account">Delete Account</string>
+    <string name="delete_success">Account successfully deleted!</string>
 
     <!--ALERTDIALOGS-->
     <string name="oops_title">Oops!</string>
     <string name="sorry_title">We\'re Sorry!</string>
+    <string name="caution_title">Caution!</string>
+    <string name="are_you_sure">Are you sure?</string>
     <string name="search_no_item_message">Please enter a username</string>
     <string name="delete_confirmation">Are you sure you want to delete your account?</string>
-    <string name="signup_error_message">Please make sure you enter a username, password and email address!</string>
+    <string name="signup_error_message">Please make sure you enter a valid username, password and email address!</string>
     <string name="login_error_message">Please make sure you enter a username and password!</string>
-    <string name="menu_delete_account">Delete Account</string>
-    <string name="caution_title">Caution!</string>
     <string name="search_same_as_user">Search item is the same as current username</string>
-    <string name="delete_success">Account successfully deleted!</string>
+    <string name="add_contact_message">Are you sure you want to add contact?</string>
+    <string name="delete_contact_message">Are you sure you want to delete contact?</string>
+    <string name="loading_account">Loading</string>
+    <string name="signup_username_error">Enter a valid username without spaces.</string>
+    <string name="signup_password_error">Be sure to give a password!</string>
+    <string name="signup_email_message">Be sure to give a e-mail address!</string>
+    <string name="signup_name_message">Be sure to give a username!</string>
+    <string name="update_contacts">Update Contacts</string>
 
 </resources>

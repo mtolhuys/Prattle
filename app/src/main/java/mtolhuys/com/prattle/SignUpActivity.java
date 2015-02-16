@@ -48,15 +48,23 @@ public class SignUpActivity extends ActionBarActivity {
                 password = password.trim();
                 email = email.trim();
 
-                if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
-                    builder.setTitle(getString(R.string.oops_title))
-                        .setMessage(getString(R.string.signup_error_message))
-                        .setPositiveButton(android.R.string.ok, null);
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                } else {
-
+                if (username.isEmpty()) {
+                    signupNameAlert();
+                }
+                else if (email.isEmpty()) {
+                    signupMailAlert();
+                }
+                else if (username.contains(" ")) {
+                    signupNameLengthAlert();
+                }
+                else if (password.isEmpty()) {
+                    signupPasswordAlert();
+                }
+                else if (username.isEmpty() || email.isEmpty() ||
+                        password.isEmpty() || username.contains(" ")) {
+                    signupOverallAlert();
+                }
+                else {
                     mProgressBar.setVisibility(View.VISIBLE);
 
                     ParseUser newUser = new ParseUser();
@@ -89,13 +97,13 @@ public class SignUpActivity extends ActionBarActivity {
         });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_sign_up, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -110,5 +118,50 @@ public class SignUpActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void signupOverallAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.signup_error_message))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void signupPasswordAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.signup_password_error))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void signupNameLengthAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.signup_username_error))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void signupMailAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.signup_email_message))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void signupNameAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.oops_title))
+                .setMessage(getString(R.string.signup_name_message))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
