@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -77,58 +78,72 @@ public class EditContactsActivity extends ListActivity {
         mSearchField = (EditText) findViewById(R.id.searchUser);
         mSearchButton = (ImageButton) findViewById(R.id.searchButton);
 
+        mSearchField.setImeActionLabel("Search", KeyEvent.KEYCODE_ENTER);
+        mSearchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                updateList();
+                return false;
+            }
+        });
+
         mSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                mProgressBar.setVisibility(View.VISIBLE);
-                mNoResult.setVisibility(View.INVISIBLE);
+                updateList();
 
-                final String searchItem = mSearchField.getText().toString();
-
-                final ParseQuery<ParseUser> query = ParseUser.getQuery();
-                query.orderByAscending(ParseConstants.KEY_USERNAME);
-                query.setLimit(100);
-                query.whereContains(ParseConstants.KEY_USERNAME, searchItem.trim());
-                query.whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUserName);
-                query.findInBackground(new FindCallback<ParseUser>() {
-                    @Override
-                    public void done(List<ParseUser> users, ParseException e) {
-
-                        mProgressBar.setVisibility(View.INVISIBLE);
-
-                        if (searchItem.isEmpty()) {
-                            noSearchItemAlert();
-                        } else if (searchItem.equals(mCurrentUserName)) {
-                            sameAsSearchItemAlert();
-                            setListAdapter(null);
-                        } else if (users.isEmpty()) {
-                            mNoResult.setVisibility(View.VISIBLE);
-                            setListAdapter(null);
-                        } else if (e == null) {
-                            mUsers = users;
-                            String[] usernames = new String[mUsers.size()];
-                            int i = 0;
-                            for (ParseUser user : mUsers) {
-                                usernames[i] = user.getUsername();
-                                i++;
-                            }
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                                    EditContactsActivity.this,
-                                    android.R.layout.simple_list_item_checked,
-                                    usernames);
-                            setListAdapter(adapter);
-
-                            addContactCheckmarks();
-                        } else {
-                            Log.e(TAG, e.getMessage());
-                            exceptionErrorAlert(e);
-                        }
-                    }
-                });
             }
         });
 
+    }
+
+    private void updateList() {
+        mProgressBar.setVisibility(View.VISIBLE);
+        mNoResult.setVisibility(View.INVISIBLE);
+
+        final String searchItem = mSearchField.getText().toString();
+
+        final ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.orderByAscending(ParseConstants.KEY_USERNAME);
+        query.setLimit(100);
+        query.whereContains(ParseConstants.KEY_USERNAME, searchItem.trim());
+        query.whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUserName);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> users, ParseException e) {
+
+                mProgressBar.setVisibility(View.INVISIBLE);
+
+                if (searchItem.isEmpty()) {
+                    noSearchItemAlert();
+                } else if (searchItem.equals(mCurrentUserName)) {
+                    sameAsSearchItemAlert();
+                    setListAdapter(null);
+                } else if (users.isEmpty()) {
+                    mNoResult.setVisibility(View.VISIBLE);
+                    setListAdapter(null);
+                } else if (e == null) {
+                    mUsers = users;
+                    String[] usernames = new String[mUsers.size()];
+                    int i = 0;
+                    for (ParseUser user : mUsers) {
+                        usernames[i] = user.getUsername();
+                        i++;
+                    }
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                            EditContactsActivity.this,
+                            android.R.layout.simple_list_item_checked,
+                            usernames);
+                    setListAdapter(adapter);
+
+                    addContactCheckmarks();
+                } else {
+                    Log.e(TAG, e.getMessage());
+                    exceptionErrorAlert(e);
+                }
+            }
+        });
     }
 
     @Override
@@ -194,13 +209,13 @@ public class EditContactsActivity extends ListActivity {
             builder.setTitle(getString(R.string.are_you_sure))
                     .setMessage(getString(R.string.add_contact_message))
                     .setCancelable(false)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getString(R.string.yes_button), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             mContactRelation.add(mUsers.get(mPosition));
                             saveInBackground();
                         }
                     })
-                    .setNegativeButton(android.R.string.cancel,
+                    .setNegativeButton(getString(R.string.no_button),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
@@ -215,13 +230,13 @@ public class EditContactsActivity extends ListActivity {
             builder.setTitle(getString(R.string.are_you_sure))
                     .setMessage(getString(R.string.delete_contact_message))
                     .setCancelable(false)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getString(R.string.yes_button), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             mContactRelation.remove(mUsers.get(mPosition));
                             saveInBackground();
                         }
                     })
-                    .setNegativeButton(android.R.string.cancel,
+                    .setNegativeButton(getString(R.string.no_button),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();

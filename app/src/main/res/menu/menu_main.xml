@@ -3,16 +3,23 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MainActivity">
 
+    <item android:id="@+id/action_delete_account"
+          android:title="@string/menu_delete_account"/>
+
     <item android:id="@+id/action_logout"
           android:title="@string/action_logout_label"
           android:orderInCategory="100"
           app:showAsAction="never"/>
 
-    <item android:id="@+id/action_edit_contacts"
-          android:title="@string/search_contacts"/>
+    <item android:id="@+id/action_camera"
+          android:icon="@drawable/ic_action_camera"
+          android:title="@string/menu_camera_label"
+          app:showAsAction="always"/>
 
-    <item android:id="@+id/action_delete_account"
-          android:title="@string/menu_delete_account"/>
+    <item android:id="@+id/action_edit_contacts"
+          android:icon="@drawable/ic_action_search_light"
+          android:title="@string/search_contacts"
+          app:showAsAction="always"/>
 
 </menu>
 

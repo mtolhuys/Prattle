@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -29,6 +30,30 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public static final String TAG = MainActivity.class.getSimpleName();
 
     protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
+
+    public static final int TAKE_PHOTO_REQUEST = 0;
+    public static final int TAKE_VIDEO_REQUEST = 1;
+    public static final int PICK_PHOTO_REQUEST = 2;
+    public static final int PICK_VIDEO_REQUEST = 3;
+
+    protected DialogInterface.OnClickListener mDialogListener =
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch(which) {
+                        case 0: // Take picture
+                            Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(takePhotoIntent, TAKE_PHOTO_REQUEST);
+                            break;
+                        case 1: // Take video
+                            break;
+                        case 2: // Choose picture
+                            break;
+                        case 3: // Choose video
+                            break;
+                    }
+                }
+            };
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -123,44 +148,56 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_logout) {
-            ParseUser.logOut();
-            goToLogin();
-            return true;
-        }
-        else if (id == R.id.action_edit_contacts) {
-            Intent intent = new Intent(this, EditContactsActivity.class);
-            startActivity(intent);
-        }
-        else if (id == R.id.action_delete_account) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.caution_title))
-                    .setMessage(getString(R.string.delete_confirmation))
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // if this button is clicked, close
-                            // current activity
-                            mCurrentUser.deleteInBackground();
-                            ParseUser.logOut();
-                            Toast.makeText(MainActivity.this, getString(R.string.delete_success), Toast.LENGTH_LONG).show();
-                            goToLogin();
-                        }
-                    })
-                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // if this button is clicked, just close
-                            // the dialog box and do nothing
-                            dialog.cancel();
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.show();
-            return true;
+        switch (id) {
+            case R.id.action_logout:
+                ParseUser.logOut();
+                goToLogin();
+                break;
+
+            case R.id.action_edit_contacts:
+                Intent intent = new Intent(this, EditContactsActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.action_delete_account:
+                deleteAccountAlert();
+                break;
+
+            case R.id.action_camera:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setItems(R.array.camera_choices, mDialogListener);
+                AlertDialog dialog = builder.create();
+                dialog.show();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteAccountAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.caution_title))
+            .setMessage(getString(R.string.delete_confirmation))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.yes_button), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // if this button is clicked, close
+                    // current activity
+                    mCurrentUser.deleteInBackground();
+                    ParseUser.logOut();
+                    Toast.makeText(MainActivity.this, getString(R.string.delete_success), Toast.LENGTH_LONG).show();
+                    goToLogin();
+                }
+            })
+            .setNegativeButton(getString(R.string.no_button), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // if this button is clicked, just close
+                    // the dialog box and do nothing
+                    dialog.cancel();
+                }
+            });
+        AlertDialog alert = builder.create();
+        alert.show();
+        return;
     }
 
     @Override

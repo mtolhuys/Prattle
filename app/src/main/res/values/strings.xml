@@ -19,6 +19,13 @@
     <string name="search_contacts">Search Contacts</string>
     <string name="menu_delete_account">Delete Account</string>
     <string name="delete_success">Account successfully deleted!</string>
+    <string name="search_field_hint">Case Sensitive Search</string>
+    <string-array name="camera_choices">
+        <item >Take Picture</item>
+        <item >Record Video</item>
+        <item >Choose Picture</item>
+        <item >Choose Video</item>
+    </string-array>
 
     <!--ALERTDIALOGS-->
     <string name="oops_title">Oops!</string>
@@ -38,6 +45,11 @@
     <string name="signup_email_message">Be sure to give a e-mail address!</string>
     <string name="signup_name_message">Be sure to give a username!</string>
     <string name="update_contacts">Update Contacts</string>
+    <string name="yes_button">Yes</string>
+    <string name="no_button">No</string>
+
+    <!--FONT-FAMILIES-->
     <string name="font_family">fonts/Ubuntu-L.ttf</string>
+    <string name="menu_camera_label">Camera</string>
 
 </resources>
