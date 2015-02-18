@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--APP STRINGS-->
+    <!-- APP STRINGS -->
     <string name="app_name">Prattle</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">Login</string>
@@ -21,18 +21,22 @@
     <string name="search_contacts">Search Contacts</string>
     <string name="search_key_label">Search</string>
     <string name="search_field_hint">Case Sensitive Search</string>
+
     <string-array name="camera_choices">
-        <item >Take Picture</item>
-        <item >Record Video</item>
-        <item >Choose Picture</item>
-        <item >Choose Video</item>
+        <item>Take Picture</item>
+        <item>Record Video</item>
+        <item>Choose Picture</item>
+        <item>Choose Video</item>
     </string-array>
+
     <string name="menu_camera_label">Camera</string>
     <string name="error_external_storage">There was a problem accessing your device\'s external storage.</string>
     <string name="create_directory_fail">Failed to create directory.</string>
-    <string name="sorry_error_message">Sorry, there was an error!</string>
+    <string name="general_error_message">Sorry, there was an error!</string>
+    <string name="indicate_video_size">The selected video must be less than 10 MB</string>
+    <string name="error_opening_file">There was a problem with the selected file.</string>
 
-    <!--ALERTDIALOGS-->
+    <!-- ALERTDIALOGS -->
     <string name="oops_title">Oops!</string>
     <string name="sorry_title">We\'re Sorry!</string>
     <string name="caution_title">Caution!</string>
@@ -53,7 +57,10 @@
     <string name="yes_button">Yes</string>
     <string name="no_button">No</string>
 
-    <!--FONT-FAMILIES-->
+    <!-- FONT-FAMILIES -->
     <string name="font_family">fonts/Ubuntu-L.ttf</string>
+    <string name="error_selected_file_size">The selected file is too large, please select a new one.</string>
+    <string name="title_activity_recipients">Choose Recipients</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

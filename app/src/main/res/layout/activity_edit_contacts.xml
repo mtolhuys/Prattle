@@ -24,7 +24,8 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="14dp"
         android:imeOptions="actionSearch"
         android:inputType="textPersonName"
         android:singleLine="true"
@@ -53,6 +54,7 @@
         android:id="@+id/noResultLabel"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:textStyle="italic"/>
+        android:textSize="20dp"
+        android:textColor="#a79c9f97"/>
 
 </RelativeLayout>

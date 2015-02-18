@@ -1,5 +1,6 @@
 package mtolhuys.com.prattle;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.LauncherActivity;
 import android.app.ListActivity;
@@ -57,6 +58,8 @@ public class EditContactsActivity extends ListActivity {
                 .setFontAttrId(R.attr.fontPath)
                 .build());
         setContentView(R.layout.activity_edit_contacts);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setIcon(android.R.color.transparent);
 
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
@@ -90,9 +93,7 @@ public class EditContactsActivity extends ListActivity {
         mSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 updateList();
-
             }
         });
 
@@ -149,28 +150,6 @@ public class EditContactsActivity extends ListActivity {
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_edit_contacts, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void addContactCheckmarks() {
