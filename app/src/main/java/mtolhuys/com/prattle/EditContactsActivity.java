@@ -78,7 +78,7 @@ public class EditContactsActivity extends ListActivity {
         mSearchField = (EditText) findViewById(R.id.searchUser);
         mSearchButton = (ImageButton) findViewById(R.id.searchButton);
 
-        mSearchField.setImeActionLabel("Search", KeyEvent.KEYCODE_ENTER);
+        mSearchField.setImeActionLabel(getString(R.string.search_key_label), KeyEvent.KEYCODE_ENTER);
         mSearchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -102,12 +102,12 @@ public class EditContactsActivity extends ListActivity {
         mProgressBar.setVisibility(View.VISIBLE);
         mNoResult.setVisibility(View.INVISIBLE);
 
-        final String searchItem = mSearchField.getText().toString();
+        final String searchItem = mSearchField.getText().toString().trim();
 
         final ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.orderByAscending(ParseConstants.KEY_USERNAME);
         query.setLimit(100);
-        query.whereContains(ParseConstants.KEY_USERNAME, searchItem.trim());
+        query.whereContains(ParseConstants.KEY_USERNAME, searchItem);
         query.whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUserName);
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override

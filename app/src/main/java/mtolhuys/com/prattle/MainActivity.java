@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
@@ -21,6 +23,11 @@ import android.widget.Toast;
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -36,14 +43,18 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public static final int PICK_PHOTO_REQUEST = 2;
     public static final int PICK_VIDEO_REQUEST = 3;
 
+    public static final int MEDIA_TYPE_IMAGE = 4;
+    public static final int MEDIA_TYPE_VIDEO = 5;
+
+    protected Uri mMediaUri;
+
     protected DialogInterface.OnClickListener mDialogListener =
             new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch(which) {
                         case 0: // Take picture
-                            Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            startActivityForResult(takePhotoIntent, TAKE_PHOTO_REQUEST);
+                            takePicture();
                             break;
                         case 1: // Take video
                             break;
@@ -51,6 +62,77 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                             break;
                         case 3: // Choose video
                             break;
+                    }
+                }
+
+                private void takePicture() {
+                    Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    mMediaUri = getOutputMediaUri(MEDIA_TYPE_IMAGE);
+                    if (mMediaUri == null) {
+                        Toast.makeText(MainActivity.this,
+                                getString(R.string.error_external_storage),
+                                Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
+                        startActivityForResult(takePhotoIntent, TAKE_PHOTO_REQUEST);
+                    }
+                }
+
+                private Uri getOutputMediaUri(int mediaType) {
+                    if (isExternalStorageAvailable()) {
+                        // 1. Get the external storage directory
+                        String appName = MainActivity.this.getString(R.string.app_name);
+                        File mediaStorageDir = new File(Environment
+                                                    .getExternalStoragePublicDirectory(Environment
+                                                    .DIRECTORY_PICTURES)
+                                                    ,appName);
+
+                        // 2. Create our subdirectory
+                        if (! mediaStorageDir.exists()) {
+                            if (! mediaStorageDir.mkdir()) {
+                                Log.e(TAG, getString(R.string.create_directory_fail));
+                                return null;
+                            }
+                        }
+
+                        // 3. Create a filename
+                        File mediaFile;
+                        Date now = new Date();
+                        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.UK).format(now);
+
+                        // 4. Create the file
+                        String path = mediaStorageDir.getPath() + File.separator;
+                        if (mediaType == MEDIA_TYPE_IMAGE) {
+                            mediaFile = new File(path + "IMG_" + timestamp + ".jpg");
+                        }
+                        else if (mediaType == MEDIA_TYPE_VIDEO) {
+                            mediaFile = new File(path + "VID_" + timestamp + ".mp4");
+                        }
+                        else {
+                            return null;
+                        }
+
+                        Log.d(TAG, "File: " + Uri.fromFile(mediaFile));
+
+                        // 5. Return the file's URI
+                        return Uri.fromFile(mediaFile);
+                    }
+                    else {
+
+                    }
+
+                    return null;
+                }
+
+                private boolean isExternalStorageAvailable() {
+                    String state = Environment.getExternalStorageState();
+
+                    if (state.equals(Environment.MEDIA_MOUNTED)) {
+                        return true;
+                    }
+                    else {
+                        return false;
                     }
                 }
             };
@@ -118,6 +200,20 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             actionBar.addTab(actionBar.newTab()
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            mediaScanIntent.setData(mMediaUri);
+            sendBroadcast(mediaScanIntent);
+        }
+        else if (resultCode != RESULT_CANCELED) {
+            Toast.makeText(this, getString(R.string.sorry_error_message), Toast.LENGTH_LONG).show();
         }
     }
 

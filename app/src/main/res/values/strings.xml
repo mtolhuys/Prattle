@@ -12,13 +12,14 @@
     <string name="email_hint">Email</string>
     <string name="signup_button_label">Sign Up</string>
     <string name="action_logout_label">Logout</string>
+    <string name="menu_delete_account">Delete Account</string>
     <string name="inbox">Inbox</string>
     <string name="friends">Contacts</string>
     <string name="no_messages">No new messages!</string>
     <string name="no_contacts">Add contacts to begin!</string>
-    <string name="search_contacts">Search Contacts</string>
-    <string name="menu_delete_account">Delete Account</string>
     <string name="delete_success">Account successfully deleted!</string>
+    <string name="search_contacts">Search Contacts</string>
+    <string name="search_key_label">Search</string>
     <string name="search_field_hint">Case Sensitive Search</string>
     <string-array name="camera_choices">
         <item >Take Picture</item>
@@ -26,17 +27,21 @@
         <item >Choose Picture</item>
         <item >Choose Video</item>
     </string-array>
+    <string name="menu_camera_label">Camera</string>
+    <string name="error_external_storage">There was a problem accessing your device\'s external storage.</string>
+    <string name="create_directory_fail">Failed to create directory.</string>
+    <string name="sorry_error_message">Sorry, there was an error!</string>
 
     <!--ALERTDIALOGS-->
     <string name="oops_title">Oops!</string>
     <string name="sorry_title">We\'re Sorry!</string>
     <string name="caution_title">Caution!</string>
     <string name="are_you_sure">Are you sure?</string>
-    <string name="search_no_item_message">Please enter a username</string>
+    <string name="search_no_item_message">Please enter a username.</string>
     <string name="delete_confirmation">Are you sure you want to delete your account?</string>
     <string name="signup_error_message">Please make sure you enter a valid username, password and email address!</string>
     <string name="login_error_message">Please make sure you enter a username and password!</string>
-    <string name="search_same_as_user">Search item is the same as current username</string>
+    <string name="search_same_as_user">Search item is the same as current username.</string>
     <string name="add_contact_message">Are you sure you want to add contact?</string>
     <string name="delete_contact_message">Are you sure you want to delete contact?</string>
     <string name="loading_account">Loading</string>
@@ -50,6 +55,5 @@
 
     <!--FONT-FAMILIES-->
     <string name="font_family">fonts/Ubuntu-L.ttf</string>
-    <string name="menu_camera_label">Camera</string>
 
 </resources>
