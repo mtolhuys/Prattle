@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +24,7 @@ public class SignUpActivity extends ActionBarActivity {
     protected EditText mPassword;
     protected EditText mEmail;
     protected Button mSignUpButton;
+    protected Button mToLoginButton;
     protected ProgressBar mProgressBar;
 
     @Override
@@ -41,6 +40,7 @@ public class SignUpActivity extends ActionBarActivity {
         mPassword = (EditText) findViewById(R.id.passwordField);
         mEmail = (EditText) findViewById(R.id.emailField);
         mSignUpButton = (Button) findViewById(R.id.signUpButton);
+        mToLoginButton = (Button) findViewById(R.id.backToLoginButton);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         mProgressBar.setVisibility(View.INVISIBLE);
@@ -52,18 +52,22 @@ public class SignUpActivity extends ActionBarActivity {
                 String password = mPassword.getText().toString();
                 String email = mEmail.getText().toString();
 
-                if (username.isEmpty()) {
-                    signupNameAlert();
-                } else if (email.isEmpty()) {
-                    signupMailAlert();
-                } else if (username.contains(" ")) {
-                    signupNameLengthAlert();
-                } else if (password.isEmpty()) {
-                    signupPasswordAlert();
-                } else if (username.isEmpty() || email.isEmpty() ||
-                        password.isEmpty() || username.contains(" ")) {
-                    signupOverallAlert();
-                } else {
+                if (username.isEmpty() && email.isEmpty()) {
+                    AlertDialogs.fillFormAlert(SignUpActivity.this);
+                }
+                else if (username.isEmpty()) {
+                    AlertDialogs.nameAlert(SignUpActivity.this);
+                }
+                else if (email.isEmpty()) {
+                    AlertDialogs.mailAlert(SignUpActivity.this);
+                }
+                else if (username.contains(" ")) {
+                    AlertDialogs.nameSpaceAlert(SignUpActivity.this);
+                }
+                else if (password.isEmpty()) {
+                    AlertDialogs.passwordAlert(SignUpActivity.this);
+                }
+                else {
                     mProgressBar.setVisibility(View.VISIBLE);
 
                     ParseUser newUser = new ParseUser();
@@ -81,7 +85,8 @@ public class SignUpActivity extends ActionBarActivity {
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
-                            } else {
+                            }
+                            else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
                                 builder.setTitle(getString(R.string.oops_title))
                                         .setMessage(e.getMessage())
@@ -94,55 +99,18 @@ public class SignUpActivity extends ActionBarActivity {
                 }
             }
         });
+
+        mToLoginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
-    private void signupOverallAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.oops_title))
-                .setMessage(getString(R.string.signup_error_message))
-                .setPositiveButton(android.R.string.ok, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void signupPasswordAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.oops_title))
-                .setMessage(getString(R.string.signup_password_error))
-                .setPositiveButton(android.R.string.ok, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void signupNameLengthAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.oops_title))
-                .setMessage(getString(R.string.signup_username_error))
-                .setPositiveButton(android.R.string.ok, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void signupMailAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.oops_title))
-                .setMessage(getString(R.string.signup_email_message))
-                .setPositiveButton(android.R.string.ok, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void signupNameAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.oops_title))
-                .setMessage(getString(R.string.signup_name_message))
-                .setPositiveButton(android.R.string.ok, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 }

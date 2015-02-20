@@ -1,6 +1,7 @@
 package mtolhuys.com.prattle;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -42,14 +44,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
 
     public static final int TAKE_PHOTO_REQUEST = 0;
-    public static final int TAKE_VIDEO_REQUEST = 1;
-    public static final int PICK_PHOTO_REQUEST = 2;
-    public static final int PICK_VIDEO_REQUEST = 3;
+    public static final int PICK_PHOTO_REQUEST = 1;
 
-    public static final int MEDIA_TYPE_IMAGE = 4;
-    public static final int MEDIA_TYPE_VIDEO = 5;
-
-    public static final int FILE_SIZE_LIMIT = 1024*1024*10; // convert KB to MB and set to 10 MB
+    public static final int MEDIA_TYPE_IMAGE = 2;
 
     protected Uri mMediaUri;
 
@@ -61,40 +58,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                         case 0: // Take picture
                             takePicture();
                             break;
-                        case 1: // Record video
-                            recordVideo();
-                            break;
-                        case 2: // Choose picture
+                        case 1: // Choose picture
                             Intent choosePhotoIntent = new Intent(Intent.ACTION_GET_CONTENT);
                             choosePhotoIntent.setType("image/*");
                             startActivityForResult(choosePhotoIntent, PICK_PHOTO_REQUEST);
                             break;
-                        case 3: // Choose video
-                            Intent chooseVideoIntent= new Intent(Intent.ACTION_GET_CONTENT);
-                            chooseVideoIntent.setType("video/*");
-                            Toast.makeText(MainActivity.this, getString(R.string.indicate_video_size)
-                                                            , Toast.LENGTH_LONG).show();
-                            startActivityForResult(chooseVideoIntent, PICK_VIDEO_REQUEST);
-                            break;
                     }
                 }
-
-                private void recordVideo() {
-                    Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                    mMediaUri = getOutputMediaUri(MEDIA_TYPE_VIDEO);
-                    if (mMediaUri == null) {
-                        Toast.makeText(MainActivity.this,
-                                getString(R.string.error_external_storage),
-                                Toast.LENGTH_LONG).show();
-                    }
-                    else {
-                        videoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
-                        videoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 10);
-                        videoIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-                        startActivityForResult(videoIntent, TAKE_VIDEO_REQUEST);
-                    }
-                }
-
                 private void takePicture() {
                     Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     mMediaUri = getOutputMediaUri(MEDIA_TYPE_IMAGE);
@@ -135,9 +105,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                         String path = mediaStorageDir.getPath() + File.separator;
                         if (mediaType == MEDIA_TYPE_IMAGE) {
                             mediaFile = new File(path + "IMG_" + timestamp + ".jpg");
-                        }
-                        else if (mediaType == MEDIA_TYPE_VIDEO) {
-                            mediaFile = new File(path + "VID_" + timestamp + ".mp4");
                         }
                         else {
                             return null;
@@ -238,41 +205,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
-            if (requestCode == PICK_PHOTO_REQUEST || requestCode == PICK_VIDEO_REQUEST) {
+            if (requestCode == PICK_PHOTO_REQUEST) {
                 if (data == null) {
                     Toast.makeText(this, getString(R.string.general_error_message)
                                        , Toast.LENGTH_LONG).show();
                 }
                 else {
                     mMediaUri = data.getData();
-                }
-                if (requestCode == PICK_VIDEO_REQUEST) {
-                    int fileSize = 0;
-                    InputStream inputStream = null;
-                    try {
-                        inputStream = getContentResolver().openInputStream(mMediaUri);
-                        fileSize = inputStream.available();
-                    }
-                    catch (FileNotFoundException e) {
-                        Toast.makeText(this, getString(R.string.error_opening_file)
-                                , Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    catch (IOException e) {
-                        Toast.makeText(this, getString(R.string.error_opening_file)
-                                , Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    finally {
-                        try {
-                            inputStream.close();
-                        } catch (IOException e) { /* Intentionally blank */ }
-                    }
-                    if (fileSize >= FILE_SIZE_LIMIT) {
-                        Toast.makeText(this, getString(R.string.error_selected_file_size)
-                                , Toast.LENGTH_LONG).show();
-                        return;
-                    }
                 }
             }
             else {
@@ -283,8 +222,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
             Intent recipientsIntent = new Intent(this, RecipientsActivity.class);
             recipientsIntent.setData(mMediaUri);
-            startActivity(recipientsIntent);
 
+            recipientsIntent.putExtra(ParseConstants.KEY_FILE_TYPE, ParseConstants.TYPE_IMAGE);
+            startActivity(recipientsIntent);
         }
         else if (resultCode != RESULT_CANCELED) {
             Toast.makeText(this, getString(R.string.general_error_message), Toast.LENGTH_LONG).show();
@@ -334,10 +274,19 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 break;
 
             case R.id.action_camera:
+                final String[] items = new String[]{getString(R.string.camera_label),
+                                                    getString(R.string.gallery_label)};
+                final Integer[] icons = new Integer[]{R.drawable.ic_action_camera_dark,
+                                                      R.drawable.ic_action_collection};
+                ListAdapter adapter = new ArrayAdapterWithIcon(this, items, icons);
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setItems(R.array.camera_choices, mDialogListener);
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                    builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int item) {
+                                mDialogListener.onClick(dialog, item);
+                            }
+                        }).show();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

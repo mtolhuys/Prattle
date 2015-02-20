@@ -5,12 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -27,6 +26,7 @@ public class LoginActivity extends ActionBarActivity {
     protected Button mLoginButton;
     protected Button mSignUptButton;
     protected ProgressBar mProgressBar;
+    protected TextView mForgotPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,25 +50,31 @@ public class LoginActivity extends ActionBarActivity {
         mUsername = (EditText) findViewById(R.id.usernameField);
         mPassword = (EditText) findViewById(R.id.passwordField);
         mLoginButton = (Button) findViewById(R.id.loginButton);
+        mForgotPassword = (TextView) findViewById(R.id.forgotPasswordField);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         mProgressBar.setVisibility(View.INVISIBLE);
+        mForgotPassword.setVisibility(View.INVISIBLE);
 
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = mUsername.getText().toString().trim();
-                String password = mPassword.getText().toString();
+                final String username = mUsername.getText().toString().trim();
+                final String password = mPassword.getText().toString();
 
                 if (username.isEmpty()) {
-                    signupNameAlert();
-                } else if (username.contains(" ")) {
-                    signupNameLengthAlert();
-                } else if (password.isEmpty()) {
-                    signupPasswordAlert();
-                } else if (username.isEmpty() || password.isEmpty() || username.contains(" ")) {
-                    signupOverallAlert();
-                } else {
+                    AlertDialogs.nameAlert(LoginActivity.this);
+                }
+                else if (username.contains(" ")) {
+                    AlertDialogs.nameSpaceAlert(LoginActivity.this);
+                }
+                else if (password.isEmpty()) {
+                    AlertDialogs.passwordAlert(LoginActivity.this);
+                }
+                else if (username.isEmpty() && password.isEmpty()) {
+                    AlertDialogs.nameAndPasswordAlert(LoginActivity.this);
+                }
+                else {
 
                     mProgressBar.setVisibility(View.VISIBLE);
 
@@ -78,12 +84,24 @@ public class LoginActivity extends ActionBarActivity {
 
                             mProgressBar.setVisibility(View.INVISIBLE);
 
-                            if (e == null) {
+                            if (user != null && e == null) {
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
-                            } else {
+                            }
+                            else if (user == null) {
+                                mForgotPassword.setVisibility(View.VISIBLE);
+                                mForgotPassword.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(LoginActivity.this,
+                                                RetrieveAccountActivity.class);
+                                        startActivity(intent);
+                                    }
+                                });
+                            }
+                            else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                                 builder.setTitle(getString(R.string.oops_title))
                                         .setMessage(e.getMessage())
@@ -101,41 +119,5 @@ public class LoginActivity extends ActionBarActivity {
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
-    private void signupOverallAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.oops_title))
-                .setMessage(getString(R.string.signup_error_message))
-                .setPositiveButton(android.R.string.ok, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void signupPasswordAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.oops_title))
-                .setMessage(getString(R.string.signup_password_error))
-                .setPositiveButton(android.R.string.ok, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void signupNameLengthAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.oops_title))
-                .setMessage(getString(R.string.signup_username_error))
-                .setPositiveButton(android.R.string.ok, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void signupNameAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.oops_title))
-                .setMessage(getString(R.string.signup_name_message))
-                .setPositiveButton(android.R.string.ok, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 }

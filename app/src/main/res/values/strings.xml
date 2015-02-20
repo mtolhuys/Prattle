@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+    <resources>
 
     <!-- FONT-FAMILIES -->
     <string name="font_family">fonts/Ubuntu-L.ttf</string>
@@ -11,17 +11,20 @@
     <string name="are_you_sure">Are you sure?</string>
     <string name="search_no_item_message">Please enter a username.</string>
     <string name="delete_confirmation">Are you sure you want to delete your account?</string>
-    <string name="signup_error_message">Please make sure you enter a valid username, password and email address!</string>
+    <string name="selected_file_alert_message">There was an error with the selected file. Please select a different file.</string>
+    <string name="sending_message_error_alert">There was an error sending your message. Please try again!</string>
     <string name="login_error_message">Please make sure you enter a username and password!</string>
     <string name="search_same_as_user">Search item is the same as current username.</string>
     <string name="add_contact_message">Are you sure you want to add contact?</string>
     <string name="delete_contact_message">Are you sure you want to delete contact?</string>
-    <string name="loading_account">Loading</string>
-    <string name="signup_username_error">Enter a valid username without spaces.</string>
-    <string name="signup_password_error">Be sure to give a password!</string>
-    <string name="signup_email_message">Be sure to give a e-mail address!</string>
-    <string name="signup_name_message">Be sure to give a username!</string>
+    <string name="overal_alert_message">Something went wrong, please try again.</string>
+    <string name="email_error_alert">Be sure to give a valid email address!</string>
+    <string name="username_error_alert">Be sure to give a username!</string>
+    <string name="password_error_alert">Be sure to give a password!</string>
+    <string name="username_space_alert">The username cannot contain spaces.</string>
+    <string name="fill_form_alert">Please fill in the form!</string>
     <string name="update_contacts">Update Contacts</string>
+    <string name="loading_account">Loading</string>
     <string name="yes_button">Yes</string>
     <string name="no_button">No</string>
 
@@ -45,12 +48,12 @@
     <string name="search_contacts">Search Contacts</string>
     <string name="search_key_label">Search</string>
     <string name="search_field_hint">Case Sensitive Search</string>
+
     <string-array name="camera_choices">
         <item>Take Picture</item>
-        <item>Record Video</item>
         <item>Choose Picture</item>
-        <item>Choose Video</item>
     </string-array>
+
     <string name="menu_camera_label">Camera</string>
     <string name="error_external_storage">There was a problem accessing your device\'s external storage.</string>
     <string name="create_directory_fail">Failed to create directory.</string>
@@ -61,5 +64,15 @@
     <string name="title_activity_recipients">Choose Recipients</string>
     <string name="choose_contact_first">Choose a contact first!</string>
     <string name="action_bar_send_button">Send</string>
+    <string name="message_sent">Message sent!</string>
+    <string name="gallery_label">Gallery</string>
+    <string name="camera_label">Camera</string>
+    <string name="sending_message">Sending Message</string>
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="title_activity_retrieve_account">Retrieve Account</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="reset_button">Reset Password</string>
+    <string name="email_sent_message">E-mail succesfully sent, check your inbox!</string>
+    <string name="back_to_login_button">Back to Login</string>
 
 </resources>

@@ -21,8 +21,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree ('src/main/libs')
     compile 'com.parse.bolts:bolts-android:1.+'
     compile 'com.android.support:appcompat-v7:21.0.3'
-    compile fileTree ('src/main/libs')
     compile 'uk.co.chrisjenx:calligraphy:2.0.1'
 }

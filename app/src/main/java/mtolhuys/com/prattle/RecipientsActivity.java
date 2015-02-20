@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,13 +15,18 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -35,6 +41,8 @@ public class RecipientsActivity extends ListActivity {
     protected ParseUser mCurrentUser;
     protected List<ParseUser> mContacts;
     protected ProgressDialog mProgressDialog;
+    protected Uri mMediaUri;
+    protected String mFileType;
 
     protected MenuItem mSendMenuItem;
 
@@ -50,6 +58,10 @@ public class RecipientsActivity extends ListActivity {
         getActionBar().setIcon(android.R.color.transparent);
 
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+
+        mMediaUri = getIntent().getData();
+        mFileType = getIntent().getExtras().getString(ParseConstants.KEY_FILE_TYPE);
+
     }
 
     @Override
@@ -120,17 +132,58 @@ public class RecipientsActivity extends ListActivity {
 
         switch (id) {
             case R.id.action_send:
-                Intent goToMain = new Intent(this, MainActivity.class);
-                startActivity(goToMain);
+                ParseObject message = createMessage();
+                if (message == null) {
+                    AlertDialogs.selectedFileAlert(this);
+                }
+                else {
+                    send(message);
+                    finish();
+                }
                 break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private ParseObject createMessage() {
+        ParseObject message = new ParseObject(ParseConstants.CLASS_MESSAGES);
+        message.put(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
+        message.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
+        message.put(ParseConstants.KEY_RECIPIENT_IDS, getRecipientIds());
+        message.put(ParseConstants.KEY_FILE_TYPE, mFileType);
+
+        byte[] fileBytes = FileHelper.getByteArrayFromFile(this, mMediaUri);
+
+        if (fileBytes == null) {
+            return null;
+        }
+        else {
+            if (mFileType.equals(ParseConstants.TYPE_IMAGE)) {
+                fileBytes = FileHelper.reduceImageForUpload(fileBytes);
+            }
+
+            String fileName = FileHelper.getFileName(this, mMediaUri, mFileType);
+            ParseFile file = new ParseFile(fileName, fileBytes);
+            message.put(ParseConstants.KEY_FILE, file);
+
+            return message;
+        }
+    }
+
+    protected ArrayList<String> getRecipientIds() {
+        ArrayList<String> recipientIds = new ArrayList<String>();
+        for (int i = 0; i < getListView().getCount(); i++) {
+            if (getListView().isItemChecked(i)) {
+                recipientIds.add(mContacts.get(i).getObjectId());
+            }
+        }
+        return recipientIds;
+    }
+
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
+//       super.onListItemClick(l, v, position, id);      <-----  preventing NullPointerException??
 
         if (l.getCheckedItemCount() > 0) {
             mSendMenuItem.setVisible(true);
@@ -138,5 +191,20 @@ public class RecipientsActivity extends ListActivity {
         else {
             mSendMenuItem.setVisible(false);
         }
+    }
+
+    protected void send(ParseObject message) {
+        message.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Toast.makeText(RecipientsActivity.this, getString(R.string.message_sent)
+                                                          , Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    AlertDialogs.sendMessageErrorAlert(RecipientsActivity.this);
+                }
+            }
+        });
     }
 }
