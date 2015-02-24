@@ -33,15 +33,12 @@ public class InboxFragment extends ListFragment {
     public void onResume() {
         super.onResume();
 
-        getActivity().setProgressBarIndeterminateVisibility(true);
-
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(ParseConstants.CLASS_MESSAGES);
-        query.whereEqualTo(ParseConstants.KEY_RECIPIENT_IDS, ParseUser.getCurrentUser().getObjectId());
+        query.whereEqualTo(ParseConstants.KEY_RECIPIENT_ID, ParseUser.getCurrentUser().getObjectId());
         query.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> messages, ParseException e) {
-                getActivity().setProgressBarIndeterminateVisibility(false);
 
                 if (e == null) {
                     // We found messages!

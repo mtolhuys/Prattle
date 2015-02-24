@@ -18,11 +18,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.File;
@@ -31,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -42,6 +49,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public static final String TAG = MainActivity.class.getSimpleName();
 
     protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
+    protected List<ParseObject> mContacts;
 
     public static final int TAKE_PHOTO_REQUEST = 0;
     public static final int PICK_PHOTO_REQUEST = 1;
@@ -49,6 +57,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public static final int MEDIA_TYPE_IMAGE = 2;
 
     protected Uri mMediaUri;
+    protected ProgressDialog mProgressDialog;
 
     protected DialogInterface.OnClickListener mDialogListener =
             new DialogInterface.OnClickListener() {
@@ -157,6 +166,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 .setFontAttrId(R.attr.fontPath)
                 .build());
         setContentView(R.layout.activity_main);
+
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setMessage(this.getString(R.string.loading_account));
 
         ParseAnalytics.trackAppOpened(getIntent());
 
@@ -287,6 +300,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                             }
                         }).show();
                 break;
+
+            case R.id.action_refresh:
+                mProgressDialog.show();
+                this.recreate();
+                mProgressDialog.dismiss();
         }
 
         return super.onOptionsItemSelected(item);
@@ -302,6 +320,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                     // if this button is clicked, close
                     // current activity
                     mCurrentUser.deleteInBackground();
+                    deleteContact();
                     ParseUser.logOut();
                     Toast.makeText(MainActivity.this, getString(R.string.delete_success), Toast.LENGTH_LONG).show();
                     goToLogin();
@@ -332,6 +351,57 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    }
+
+    private void deleteContact() {
+
+        ParseQuery<ParseObject> deleteMyContactList = ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS);
+        deleteMyContactList.orderByAscending(ParseConstants.KEY_SENDER_NAME);
+        deleteMyContactList.whereContains(ParseConstants.KEY_RECIPIENT_ID, ParseUser.getCurrentUser().getObjectId());
+        deleteMyContactList.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> contacts, ParseException e) {
+
+                if (e == null && contacts != null) {
+
+                    for (int i = 0; i < contacts.size(); i++) {
+                        ParseObject contact = contacts.get(i);
+                        contact.deleteInBackground(new DeleteCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    Toast.makeText(MainActivity.this, "Delete Contact List Failed", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+        ParseQuery<ParseObject> deleteMeAtUsersContactList = ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS);
+        deleteMeAtUsersContactList.orderByAscending(ParseConstants.KEY_SENDER_NAME);
+        deleteMeAtUsersContactList.whereContains(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
+        deleteMeAtUsersContactList.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> contacts, ParseException e) {
+
+                if (e == null && contacts != null) {
+
+                    for (int i = 0; i < contacts.size(); i++) {
+                        ParseObject contact = contacts.get(i);
+                        contact.deleteInBackground(new DeleteCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    Toast.makeText(MainActivity.this, "Delete Contact List Failed", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
 }

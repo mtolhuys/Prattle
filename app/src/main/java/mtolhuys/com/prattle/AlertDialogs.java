@@ -89,4 +89,22 @@ public class AlertDialogs {
         dialog.show();
     }
 
+    public static void sameAsSearchItemAlert(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(context.getString(R.string.oops_title))
+                .setMessage(context.getString(R.string.search_same_as_user))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public static void noSearchItemAlert(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(context.getString(R.string.oops_title))
+                .setMessage(context.getString(R.string.search_no_item_message))
+                .setPositiveButton(android.R.string.ok, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 }
