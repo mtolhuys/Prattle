@@ -39,7 +39,7 @@ public class RecipientsActivity extends ListActivity {
 
     protected ParseRelation<ParseUser> mContactRelation;
     protected ParseUser mCurrentUser;
-    protected List<ParseUser> mContacts;
+    protected List<ParseObject> mContacts;
     protected ProgressDialog mProgressDialog;
     protected Uri mMediaUri;
     protected String mFileType;
@@ -78,35 +78,70 @@ public class RecipientsActivity extends ListActivity {
         mCurrentUser = ParseUser.getCurrentUser();
         mContactRelation = mCurrentUser.getRelation(ParseConstants.KEY_CONTACT_RELATION);
 
-        ParseQuery<ParseUser> query = mContactRelation.getQuery();
-        query.addAscendingOrder(ParseConstants.KEY_USERNAME);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> contacts, ParseException e) {
-                mProgressDialog.dismiss();
-                if (e == null) {
-                    mContacts = contacts;
-                    String[] usernames = new String[mContacts.size()];
-                    int i = 0;
-                    for (ParseUser user : mContacts) {
-                        usernames[i] = user.getUsername();
-                        i++;
+        ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
+                .setLimit(1000)
+                .whereContains(ParseConstants.KEY_RECIPIENT_ID, ParseUser.getCurrentUser().getObjectId())
+                .findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> contacts, ParseException e) {
+                        mProgressDialog.dismiss();
+
+                        if (e == null && contacts != null) {
+                            // We found messages!
+                            mContacts = contacts;
+
+                            String[] usernames = new String[mContacts.size()];
+
+                            int i = 0;
+                            for (ParseObject contact : mContacts) {
+                                usernames[i] = contact.getString(ParseConstants.KEY_SENDER_NAME);
+                                i++;
+                            }
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                    getListView().getContext(),
+                                    android.R.layout.simple_list_item_checked,
+                                    usernames);
+                            setListAdapter(adapter);
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getListView().getContext());
+                            builder.setTitle(getString(R.string.oops_title))
+                                    .setMessage(e.getMessage())
+                                    .setPositiveButton(android.R.string.ok, null);
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
                     }
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                            getListView().getContext(),
-                            android.R.layout.simple_list_item_checked,
-                            usernames);
-                    setListAdapter(adapter);
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getListView().getContext());
-                    builder.setTitle(getString(R.string.oops_title))
-                            .setMessage(e.getMessage())
-                            .setPositiveButton(android.R.string.ok, null);
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-            }
-        });
+                });
+
+//        ParseQuery<ParseUser> query = mContactRelation.getQuery();
+//        query.addAscendingOrder(ParseConstants.KEY_USERNAME);
+//        query.findInBackground(new FindCallback<ParseUser>() {
+//            @Override
+//            public void done(List<ParseUser> contacts, ParseException e) {
+//                mProgressDialog.dismiss();
+//                if (e == null) {
+//                    mContacts = contacts;
+//                    String[] usernames = new String[mContacts.size()];
+//                    int i = 0;
+//                    for (ParseUser user : mContacts) {
+//                        usernames[i] = user.getUsername();
+//                        i++;
+//                    }
+//                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+//                            getListView().getContext(),
+//                            android.R.layout.simple_list_item_checked,
+//                            usernames);
+//                    setListAdapter(adapter);
+//                } else {
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(getListView().getContext());
+//                    builder.setTitle(getString(R.string.oops_title))
+//                            .setMessage(e.getMessage())
+//                            .setPositiveButton(android.R.string.ok, null);
+//                    AlertDialog dialog = builder.create();
+//                    dialog.show();
+//                }
+//            }
+//        });
     }
 
     @Override

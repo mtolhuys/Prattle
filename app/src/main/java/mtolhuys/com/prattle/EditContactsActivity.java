@@ -48,8 +48,9 @@ public class EditContactsActivity extends ListActivity {
     protected EditText mSearchField;
     protected TextView mNoResult;
     protected ImageButton mSearchButton;
-    protected int mPosition;
     protected ListView mListView;
+    protected String mUserIds;
+    protected int mPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -374,23 +375,15 @@ public class EditContactsActivity extends ListActivity {
                                     contact.deleteInBackground(new DeleteCallback() {
                                         @Override
                                         public void done(ParseException e) {
-
                                             if (e != null) {
                                                 Toast.makeText(EditContactsActivity.this,
-                                                        "Delete Contact List Failed",
+                                                        getString(R.string.delete_contact_failed),
                                                         Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     });
                                 }
-                                else {
-                                    Toast.makeText(EditContactsActivity.this,
-                                            "No results found in Contacts"
-                                            , Toast.LENGTH_SHORT).show();
-                                    mListView.setItemChecked(mPosition, true);
-                                }
                             }
-
                         }
                     }
                 });
@@ -416,11 +409,11 @@ public class EditContactsActivity extends ListActivity {
                                 @Override
                                 public void done(ParseException e) {
                                     Toast.makeText(EditContactsActivity.this,
-                                            "Deleted Contact!",
+                                            getString(R.string.deleted_contact),
                                             Toast.LENGTH_SHORT).show();
                                     if (e != null) {
                                         Toast.makeText(EditContactsActivity.this,
-                                                "Delete Contact Failed",
+                                                getString(R.string.delete_contact_failed),
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 }
@@ -448,27 +441,26 @@ public class EditContactsActivity extends ListActivity {
                                 requestsIds[i] = request.getString(ParseConstants.KEY_REQUEST_TO);
 
                                 if (Arrays.asList(requestsIds).contains(mUsers.get(mPosition).getObjectId())) {
-                                    request.deleteInBackground(new DeleteCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            Toast.makeText(EditContactsActivity.this,
-                                                    "Deleted Request!",
-                                                    Toast.LENGTH_SHORT).show();
-                                            if (e != null) {
+                                    for (int j = 0; j < mUsers.size(); j++) {
+                                        mUserIds = mUsers.get(mPosition).getObjectId();
+                                    }
+                                    if (mUserIds.equals(request.get(ParseConstants.KEY_REQUEST_TO))) {
+                                        request.deleteInBackground(new DeleteCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
                                                 Toast.makeText(EditContactsActivity.this,
-                                                        "Delete Request Failed",
+                                                        getString(R.string.request_deleted),
                                                         Toast.LENGTH_SHORT).show();
+                                                if (e != null) {
+                                                    Toast.makeText(EditContactsActivity.this,
+                                                            getString(R.string.delete_request_failed),
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
                                             }
-                                        }
-                                    });
-                                }
-                                else {
-                                    Toast.makeText(EditContactsActivity.this,
-                                            "No results found in requests check"
-                                            , Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
                                 }
                             }
-
                         }
                     }
                 });
@@ -489,27 +481,26 @@ public class EditContactsActivity extends ListActivity {
                                 requestsIds[i] = request.getString(ParseConstants.KEY_REQUEST_FROM);
 
                                 if (Arrays.asList(requestsIds).contains(mUsers.get(mPosition).getObjectId())) {
-                                    request.deleteInBackground(new DeleteCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            Toast.makeText(EditContactsActivity.this,
-                                                    "Deleted Request!",
-                                                    Toast.LENGTH_SHORT).show();
-                                            if (e != null) {
+                                    for (int j = 0; j < mUsers.size(); j++) {
+                                        mUserIds = mUsers.get(mPosition).getObjectId();
+                                    }
+                                    if (mUserIds.equals(request.get(ParseConstants.KEY_REQUEST_FROM))) {
+                                        request.deleteInBackground(new DeleteCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
                                                 Toast.makeText(EditContactsActivity.this,
-                                                        "Delete Request Failed",
+                                                        getString(R.string.request_deleted),
                                                         Toast.LENGTH_SHORT).show();
+                                                if (e != null) {
+                                                    Toast.makeText(EditContactsActivity.this,
+                                                            getString(R.string.delete_request_failed),
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
                                             }
-                                        }
-                                    });
-                                }
-                                else {
-                                    Toast.makeText(EditContactsActivity.this,
-                                            "No results found in requests check"
-                                            , Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
                                 }
                             }
-
                         }
                     }
                 });
