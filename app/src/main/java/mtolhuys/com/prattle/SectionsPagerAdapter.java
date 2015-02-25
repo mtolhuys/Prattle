@@ -32,6 +32,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return new InboxFragment();
             case 1:
                 return new ContactsFragment();
+            case 2:
+                return new RequestsFragment();
         }
         return null;
     }
@@ -39,7 +41,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // Show 3 total pages.
-        return 2;
+        return 3;
     }
 
     @Override
@@ -49,7 +51,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return mContext.getString(R.string.inbox).toUpperCase(l);
             case 1:
-                return mContext.getString(R.string.friends).toUpperCase(l);
+                return mContext.getString(R.string.contacts).toUpperCase(l);
+            case 2:
+                return mContext.getString(R.string.requests).toUpperCase(l);
         }
         return null;
     }

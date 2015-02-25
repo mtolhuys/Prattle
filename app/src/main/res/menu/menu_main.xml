@@ -21,5 +21,10 @@
           android:title="@string/search_contacts"
           app:showAsAction="always"/>
 
+    <item android:id="@+id/action_refresh"
+          android:icon="@drawable/ic_action_refresh"
+          android:title="@string/menu_camera_label"
+          app:showAsAction="always"/>
+
 </menu>
 

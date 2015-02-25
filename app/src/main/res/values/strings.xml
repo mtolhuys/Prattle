@@ -41,7 +41,8 @@
     <string name="action_logout_label">Logout</string>
     <string name="menu_delete_account">Delete Account</string>
     <string name="inbox">Inbox</string>
-    <string name="friends">Contacts</string>
+    <string name="contacts">Contacts</string>
+    <string name="requests">Requests</string>
     <string name="no_messages">No new messages!</string>
     <string name="no_contacts">Add contacts to begin!</string>
     <string name="delete_success">Account successfully deleted!</string>
@@ -74,5 +75,10 @@
     <string name="reset_button">Reset Password</string>
     <string name="email_sent_message">E-mail succesfully sent, check your inbox!</string>
     <string name="back_to_login_button">Back to Login</string>
+    <string name="no_requests">No Requests</string>
+    <string name="send_message">Send Message</string>
+    <string name="delete_contact">Delete Contact</string>
+    <string name="delete_request_contact_question">There either is a request to or from this user or this user is already a contact of yours. Do you want to delete the request or contact?</string>
+    <string name="delete_request_contact_title">We found this user in our database!</string>
 
 </resources>
