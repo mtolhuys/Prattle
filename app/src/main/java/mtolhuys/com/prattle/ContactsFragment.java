@@ -30,14 +30,9 @@ import java.util.List;
 public class ContactsFragment extends ListFragment {
 
     protected List<ParseObject> mContacts;
-    protected String mContactId;
     protected int mPosition;
     protected ListView mListView;
     protected ProgressDialog mProgressDialog;
-    protected String mUsername;
-    protected String[] mContactObjects;
-    protected String mUserId;
-    protected String mDate;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

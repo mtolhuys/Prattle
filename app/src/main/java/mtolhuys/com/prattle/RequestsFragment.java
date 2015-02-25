@@ -48,6 +48,7 @@ public class RequestsFragment extends ListFragment {
         super.onResume();
 
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(ParseConstants.CLASS_ADD_REQUESTS);
+        query.setLimit(1000);
         query.orderByAscending(ParseConstants.KEY_SENDER_NAME);
         query.whereEqualTo(ParseConstants.KEY_REQUEST_TO, ParseUser.getCurrentUser().getObjectId());
         query.findInBackground(new FindCallback<ParseObject>() {

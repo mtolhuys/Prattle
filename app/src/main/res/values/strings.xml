@@ -78,7 +78,7 @@
     <string name="no_requests">No Requests</string>
     <string name="send_message">Send Message</string>
     <string name="delete_contact">Delete Contact</string>
-    <string name="delete_request_contact_question">You either already sent a request to this user or this user is already a contact of yours. Do you want to delete the request or contact?</string>
+    <string name="delete_request_contact_question">There either is a request to or from this user or this user is already a contact of yours. Do you want to delete the request or contact?</string>
     <string name="delete_request_contact_title">We found this user in our database!</string>
 
 </resources>
