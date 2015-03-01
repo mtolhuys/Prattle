@@ -85,7 +85,7 @@ public class ContactsFragment extends ListFragment {
 
         ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
                 .setLimit(1000)
-                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
+                //.orderByAscending(ParseConstants.KEY_SENDER_NAME)
                 .whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId())
                 .findInBackground(new FindCallback<ParseObject>() {
                     @Override
@@ -154,7 +154,7 @@ public class ContactsFragment extends ListFragment {
 
     private void updateCheckMarks() {
         for (int i = 0; i < mContactsList.size(); i++) {
-            if (mContact.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+            if (mContactsList.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
                 getListView().setItemChecked(i, true);
             }
             else {

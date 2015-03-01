@@ -305,49 +305,22 @@ public class EditContactsActivity extends ListActivity {
 
         mProgressDialog.show();
 
-        if (mRequest != null) {
-            if (mRequest.getList(ParseConstants.KEY_USERS_IDS)
-                    .contains(mUsers.get(mPosition).getObjectId())) {
-                mRequest.deleteInBackground(new DeleteCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            Toast.makeText(EditContactsActivity.this,
-                                    getString(R.string.request_deleted),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        else if (e != null) {
-                            Toast.makeText(EditContactsActivity.this,
-                                    getString(R.string.delete_request_failed),
-                                    Toast.LENGTH_SHORT).show();
-                            getListView().setItemChecked(mPosition, true);
-                        }
-                    }
-                });
+        mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Toast.makeText(EditContactsActivity.this,
+                            getString(R.string.delete_success),
+                            Toast.LENGTH_SHORT).show();
+                } else if (e != null) {
+                    Toast.makeText(EditContactsActivity.this,
+                            getString(R.string.delete_failed),
+                            Toast.LENGTH_SHORT).show();
+                    getListView().setItemChecked(mPosition, true);
+                }
+                updateList();
             }
-        }
-
-        if (mContact != null) {
-            if (mContact.getList(ParseConstants.KEY_USERS_IDS)
-                    .contains(mUsers.get(mPosition).getObjectId())) {
-                mContact.deleteInBackground(new DeleteCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            Toast.makeText(EditContactsActivity.this,
-                                    getString(R.string.contact_deleted),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        else if (e != null) {
-                            Toast.makeText(EditContactsActivity.this,
-                                    getString(R.string.delete_contact_failed),
-                                    Toast.LENGTH_SHORT).show();
-                            getListView().setItemChecked(mPosition, true);
-                        }
-                    }
-                });
-            }
-        }
+        });
 
         mProgressDialog.dismiss();
 
