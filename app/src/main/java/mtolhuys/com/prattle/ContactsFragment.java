@@ -153,52 +153,15 @@ public class ContactsFragment extends ListFragment {
     }
 
     private void updateCheckMarks() {
-
-        for (int i = 0; i < mContactNames.size(); i++) {
-            getListView().setItemChecked(i, mContactsList.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS));
+        for (int i = 0; i < mContactsList.size(); i++) {
+            if (mContact.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+                getListView().setItemChecked(i, true);
+            }
+            else {
+                getListView().setItemChecked(i, false);
+            }
         }
-
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//
-//        ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
-//                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
-//                .whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId())
-//                .findInBackground(new FindCallback<ParseObject>() {
-//            @Override
-//            public void done(List<ParseObject> contacts, ParseException e) {
-//
-//                if (e == null && contacts != null) {
-//                    // We found contacts!
-//                    mContactsList = contacts;
-//
-//                    String[] usernames = new String[mContactsList.size()];
-//
-//                    int i = 0;
-//                    for (ParseObject contact : mContactsList) {
-//                        if (contact.getString(ParseConstants.KEY_RECIPIENT_NAME)
-//                                .equals(ParseUser.getCurrentUser().getUsername())) {
-//                            usernames[i] = contact.getString(ParseConstants.KEY_SENDER_NAME);
-//                        }
-//                        else if (contact.getString(ParseConstants.KEY_SENDER_NAME)
-//                                .equals(ParseUser.getCurrentUser().getUsername())) {
-//                            usernames[i] = contact.getString(ParseConstants.KEY_RECIPIENT_NAME);
-//                        }
-//                        i++;
-//                    }
-//                    mArrayAdapter = new ArrayAdapter<String>(
-//                            getListView().getContext(),
-//                            android.R.layout.simple_list_item_1,
-//                            usernames);
-//                    mArrayAdapter.setNotifyOnChange(true);
-//                    setListAdapter(mArrayAdapter);
-//                }
-//            }
-//        });
-//    }
 
     @Override
     public void onListItemClick(ListView l, View v, final int position, long id) {
