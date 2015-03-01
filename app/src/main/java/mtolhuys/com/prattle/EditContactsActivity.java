@@ -26,9 +26,7 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -40,16 +38,21 @@ public class EditContactsActivity extends ListActivity {
     public static final String TAG = EditContactsActivity.class.getSimpleName();
 
     protected String mCurrentUserName = ParseUser.getCurrentUser().getUsername();
+    protected String mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
     protected List<ParseUser> mUsers;
+    protected List<ParseObject> mContacts;
     protected ParseRelation<ParseUser> mContactRelation;
     protected ParseUser mCurrentUser;
+    protected ParseObject mContact;
+    protected ParseObject mRequest;
     protected ProgressBar mProgressBar;
     protected ProgressDialog mProgressDialog;
     protected EditText mSearchField;
     protected TextView mNoResult;
     protected ImageButton mSearchButton;
     protected ListView mListView;
-    protected String mUserIds;
+    protected String[] mContactIds;
+    protected ArrayAdapter<String> mAdapter;
     protected int mPosition;
 
     @Override
@@ -70,6 +73,10 @@ public class EditContactsActivity extends ListActivity {
 
         mProgressBar.setVisibility(View.INVISIBLE);
         mNoResult.setVisibility(View.INVISIBLE);
+
+        mProgressDialog = new ProgressDialog(EditContactsActivity.this);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setMessage(getString(R.string.update_contacts));
     }
 
     @Override
@@ -87,7 +94,12 @@ public class EditContactsActivity extends ListActivity {
         mSearchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                updateList();
+                if (actionId == KeyEvent.ACTION_DOWN) {
+                    updateList();
+                    return false;
+                } else if (actionId == KeyEvent.ACTION_UP) {
+                    return false;
+                }
                 return false;
             }
         });
@@ -105,6 +117,8 @@ public class EditContactsActivity extends ListActivity {
         mProgressBar.setVisibility(View.VISIBLE);
         mNoResult.setVisibility(View.INVISIBLE);
 
+        mProgressDialog.show();
+
         final String searchItem = mSearchField.getText().toString().trim();
 
         final ParseQuery<ParseUser> query = ParseUser.getQuery();
@@ -120,13 +134,16 @@ public class EditContactsActivity extends ListActivity {
 
                 if (searchItem.isEmpty()) {
                     AlertDialogs.noSearchItemAlert(EditContactsActivity.this);
-                } else if (users.isEmpty() && searchItem.equals(mCurrentUserName)) {
+                }
+                else if (users.isEmpty() && searchItem.equals(mCurrentUserName)) {
                     AlertDialogs.sameAsSearchItemAlert(EditContactsActivity.this);
                     setListAdapter(null);
-                } else if (users.isEmpty() && !searchItem.equals(mCurrentUserName)) {
+                }
+                else if (users.isEmpty() && !searchItem.equals(mCurrentUserName)) {
                     mNoResult.setVisibility(View.VISIBLE);
                     setListAdapter(null);
-                } else if (e == null) {
+                }
+                else if (e == null) {
                     mUsers = users;
                     String[] usernames = new String[mUsers.size()];
                     int i = 0;
@@ -134,12 +151,11 @@ public class EditContactsActivity extends ListActivity {
                         usernames[i] = user.getUsername();
                         i++;
                     }
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                    mAdapter = new ArrayAdapter<>(
                             EditContactsActivity.this,
                             android.R.layout.simple_list_item_checked,
                             usernames);
-                    setListAdapter(adapter);
-
+                    setListAdapter(mAdapter);
                     addContactCheckmarks();
                 } else {
                     Log.e(TAG, e.getMessage());
@@ -147,6 +163,9 @@ public class EditContactsActivity extends ListActivity {
                 }
             }
         });
+
+        mProgressDialog.dismiss();
+
     }
 
     @Override
@@ -156,122 +175,54 @@ public class EditContactsActivity extends ListActivity {
 
     private void addContactCheckmarks() {
 
-        ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
-                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
-                .whereContains(ParseConstants.KEY_RECIPIENT_ID, ParseUser.getCurrentUser().getObjectId())
-                .findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> contacts, ParseException e) {
-                        if (e == null) {
-                            // List returned, look for matches
-                            String[] contactIds = new String[contacts.size()];
-                            String[] userIds = new String[mUsers.size()];
-                            mListView = getListView();
+        ParseQuery contactQuery = ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS);
+        contactQuery.setLimit(1000);
+        contactQuery.orderByAscending(ParseConstants.KEY_SENDER_NAME);
+        contactQuery.whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId());
 
-                            if (contacts.size() > 0) {
+        contactQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> contacts, ParseException e) {
+                if (e == null && contacts != null) {
 
-                                for (int i = 0; i < contacts.size(); i++) {
-                                    ParseObject contact = contacts.get(i);
-                                    contactIds[i] = contact.getString(ParseConstants.KEY_SENDER_NAME);
-                                }
-                                for (int i = 0; i < mUsers.size(); i++) {
-                                    userIds[i] = mUsers.get(i).getUsername();
-                                }
-                                int i = 0;
-                                for (String user : userIds) {
-                                    if (Arrays.asList( contactIds).contains(user)) {
-                                        mListView.setItemChecked(i, true);
-                                    }
-                                    i++;
-                                }
+                    mContacts = contacts;
+
+                    if (contacts.size() > 0) {
+
+                    String[] userIds = new String[mUsers.size()];
+                    mContactIds = new String[mContacts.size()];
+
+                        for (int i = 0; i < mContacts.size(); i++) {
+                            mContact = mContacts.get(i);
+
+                            if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
+                                    .equals(mCurrentUserId)) {
+                                mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
                             }
-                            else {
-                                return;
+                            if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(1)
+                                    .equals(mCurrentUserId)) {
+                                mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
                             }
                         }
-                        else {
-                            Log.e(TAG, e.getMessage());
+
+                        for (int i = 0; i < mUsers.size(); i++) {
+                            userIds[i] = mUsers.get(i).getObjectId();
                         }
+                        int i = 0;
+                        for (String user : userIds) {
+                            if (Arrays.asList(mContactIds).contains(user)) {
+                                getListView().setItemChecked(i, true);
+                            }
+                            i++;
+                        }
+
                     }
-                });
-
-        ParseQuery.getQuery(ParseConstants.CLASS_ADD_REQUESTS)
-                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
-                .whereContains(ParseConstants.KEY_REQUEST_FROM, ParseUser.getCurrentUser().getObjectId())
-                .findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> requests, ParseException e) {
-                        if (e == null) {
-                            // List returned, look for matches
-                            String[] requestsIds = new String[requests.size()];
-                            String[] usersIds = new String[mUsers.size()];
-                            mListView = getListView();
-
-                            if (requests.size() > 0) {
-
-                                for (int i = 0; i < requests.size(); i++) {
-                                    ParseObject contact = requests.get(i);
-                                    requestsIds[i] = contact.getString(ParseConstants.KEY_REQUEST_TO);
-                                }
-                                for (int i = 0; i < mUsers.size(); i++) {
-                                    usersIds[i] = mUsers.get(i).getObjectId();
-                                }
-                                int i = 0;
-                                for (String user : usersIds) {
-                                    if (Arrays.asList(requestsIds).contains(user)) {
-                                        mListView.setItemChecked(i, true);
-                                    }
-                                    i++;
-                                }
-                            }
-                            else {
-                                return;
-                            }
-                        }
-                        else {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    }
-                });
-
-        ParseQuery.getQuery(ParseConstants.CLASS_ADD_REQUESTS)
-                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
-                .whereContains(ParseConstants.KEY_REQUEST_TO, ParseUser.getCurrentUser().getObjectId())
-                .findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> requests, ParseException e) {
-                        if (e == null) {
-                            // List returned, look for matches
-                            String[] requestsIds = new String[requests.size()];
-                            String[] usersIds = new String[mUsers.size()];
-                            mListView = getListView();
-
-                            if (requests.size() > 0) {
-
-                                for (int i = 0; i < requests.size(); i++) {
-                                    ParseObject contact = requests.get(i);
-                                    requestsIds[i] = contact.getString(ParseConstants.KEY_REQUEST_FROM);
-                                }
-                                for (int i = 0; i < mUsers.size(); i++) {
-                                    usersIds[i] = mUsers.get(i).getObjectId();
-                                }
-                                int i = 0;
-                                for (String user : usersIds) {
-                                    if (Arrays.asList(requestsIds).contains(user)) {
-                                        mListView.setItemChecked(i, true);
-                                    }
-                                    i++;
-                                }
-                            }
-                            else {
-                                return;
-                            }
-                        }
-                        else {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    }
-                });
+                }
+                else if (e != null) {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        });
     }
 
     @Override
@@ -280,10 +231,6 @@ public class EditContactsActivity extends ListActivity {
 
         mPosition = position;
         mListView = l;
-
-        mProgressDialog = new ProgressDialog(EditContactsActivity.this);
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setMessage(getString(R.string.update_contacts));
 
         if (getListView().isItemChecked(mPosition)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -295,10 +242,12 @@ public class EditContactsActivity extends ListActivity {
 
                             mProgressDialog.show();
 
-                            ParseObject addRequest = new ParseObject(ParseConstants.CLASS_ADD_REQUESTS);
-                            addRequest.put(ParseConstants.KEY_REQUEST_FROM, ParseUser.getCurrentUser().getObjectId());
-                            addRequest.put(ParseConstants.KEY_REQUEST_TO, mUsers.get(mPosition).getObjectId());
+                            ParseObject addRequest = new ParseObject(ParseConstants.CLASS_CONTACTS);
+                            addRequest.add(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId());
+                            addRequest.add(ParseConstants.KEY_USERS_IDS, mUsers.get(mPosition).getObjectId());
                             addRequest.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
+                            addRequest.put(ParseConstants.KEY_RECIPIENT_NAME, mUsers.get(mPosition).getUsername());
+                            addRequest.put(ParseConstants.KEY_CONTACT_STATUS, false);
                             addRequest.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
@@ -306,7 +255,7 @@ public class EditContactsActivity extends ListActivity {
                                         Toast.makeText(EditContactsActivity.this,
                                                 "Contact Request Sent",
                                                 Toast.LENGTH_SHORT).show();
-                                        mProgressDialog.dismiss();
+                                        updateList();
                                     }
                                     else {
                                         Toast.makeText(EditContactsActivity.this,
@@ -335,7 +284,8 @@ public class EditContactsActivity extends ListActivity {
                     .setCancelable(false)
                     .setPositiveButton(getString(R.string.yes_button), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            deleteContactOrRequest();
+                            mProgressDialog.show();
+                            delete();
                             dialog.cancel();
                         }
                     })
@@ -351,159 +301,53 @@ public class EditContactsActivity extends ListActivity {
         }
     }
 
-    private void deleteContactOrRequest() {
+    private void delete() {
 
-        ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
-                .setLimit(1000)
-                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
-                .whereContains(ParseConstants.KEY_RECIPIENT_ID, ParseUser.getCurrentUser().getObjectId())
-                .findInBackground(new FindCallback<ParseObject>() {
+        mProgressDialog.show();
+
+        if (mRequest != null) {
+            if (mRequest.getList(ParseConstants.KEY_USERS_IDS)
+                    .contains(mUsers.get(mPosition).getObjectId())) {
+                mRequest.deleteInBackground(new DeleteCallback() {
                     @Override
-                    public void done(List<ParseObject> contacts, ParseException e) {
-
-                        if (e == null && contacts != null) {
-
-                            String[] contactsIds = new String[contacts.size()];
-                            ParseObject contact;
-
-                            for (int i = 0; i < contacts.size(); i++) {
-                                contact = contacts.get(i);
-                                contactsIds[i] = contact.getString(ParseConstants.KEY_SENDER_ID);
-
-                                if (Arrays.asList(contactsIds).contains(mUsers.get(mPosition).getObjectId())) {
-                                    contact = contacts.get(mPosition);
-                                    contact.deleteInBackground(new DeleteCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            if (e != null) {
-                                                Toast.makeText(EditContactsActivity.this,
-                                                        getString(R.string.delete_contact_failed),
-                                                        Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-                                }
-                            }
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            Toast.makeText(EditContactsActivity.this,
+                                    getString(R.string.request_deleted),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        else if (e != null) {
+                            Toast.makeText(EditContactsActivity.this,
+                                    getString(R.string.delete_request_failed),
+                                    Toast.LENGTH_SHORT).show();
+                            getListView().setItemChecked(mPosition, true);
                         }
                     }
                 });
-
-        ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
-                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
-                .whereContains(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId())
-                .findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> contacts, ParseException e) {
-
-                if (e == null && contacts != null) {
-
-                    String[] contactsIds = new String[contacts.size()];
-                    ParseObject contact;
-
-                    for (int i = 0; i < contacts.size(); i++) {
-                        contact = contacts.get(i);
-                        contactsIds[i] = contact.getString(ParseConstants.KEY_RECIPIENT_ID);
-
-                        if (Arrays.asList(contactsIds).contains(mUsers.get(mPosition).getObjectId())) {
-                            contact.deleteInBackground(new DeleteCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    Toast.makeText(EditContactsActivity.this,
-                                            getString(R.string.deleted_contact),
-                                            Toast.LENGTH_SHORT).show();
-                                    if (e != null) {
-                                        Toast.makeText(EditContactsActivity.this,
-                                                getString(R.string.delete_contact_failed),
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                        }
-                    }
-
-                }
             }
-        });
+        }
 
-        ParseQuery.getQuery(ParseConstants.CLASS_ADD_REQUESTS)
-                .setLimit(1000)
-                .whereContains(ParseConstants.KEY_REQUEST_FROM, ParseUser.getCurrentUser().getObjectId())
-                .findInBackground(new FindCallback<ParseObject>() {
+        if (mContact != null) {
+            if (mContact.getList(ParseConstants.KEY_USERS_IDS)
+                    .contains(mUsers.get(mPosition).getObjectId())) {
+                mContact.deleteInBackground(new DeleteCallback() {
                     @Override
-                    public void done(List<ParseObject> requests, ParseException e) {
-                        if (e == null && requests != null) {
-
-                            String[] requestsIds = new String[requests.size()];
-                            ParseObject request;
-
-                            for (int i = 0; i < requests.size(); i++) {
-                                request = requests.get(i);
-                                requestsIds[i] = request.getString(ParseConstants.KEY_REQUEST_TO);
-
-                                if (Arrays.asList(requestsIds).contains(mUsers.get(mPosition).getObjectId())) {
-                                    for (int j = 0; j < mUsers.size(); j++) {
-                                        mUserIds = mUsers.get(mPosition).getObjectId();
-                                    }
-                                    if (mUserIds.equals(request.get(ParseConstants.KEY_REQUEST_TO))) {
-                                        request.deleteInBackground(new DeleteCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                Toast.makeText(EditContactsActivity.this,
-                                                        getString(R.string.request_deleted),
-                                                        Toast.LENGTH_SHORT).show();
-                                                if (e != null) {
-                                                    Toast.makeText(EditContactsActivity.this,
-                                                            getString(R.string.delete_request_failed),
-                                                            Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
-                                        });
-                                    }
-                                }
-                            }
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            Toast.makeText(EditContactsActivity.this,
+                                    getString(R.string.contact_deleted),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        else if (e != null) {
+                            Toast.makeText(EditContactsActivity.this,
+                                    getString(R.string.delete_contact_failed),
+                                    Toast.LENGTH_SHORT).show();
+                            getListView().setItemChecked(mPosition, true);
                         }
                     }
                 });
-
-        ParseQuery.getQuery(ParseConstants.CLASS_ADD_REQUESTS)
-                .setLimit(1000)
-                .whereContains(ParseConstants.KEY_REQUEST_TO, ParseUser.getCurrentUser().getObjectId())
-                .findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> requests, ParseException e) {
-                        if (e == null && requests != null) {
-
-                            String[] requestsIds = new String[requests.size()];
-                            ParseObject request;
-
-                            for (int i = 0; i < requests.size(); i++) {
-                                request = requests.get(i);
-                                requestsIds[i] = request.getString(ParseConstants.KEY_REQUEST_FROM);
-
-                                if (Arrays.asList(requestsIds).contains(mUsers.get(mPosition).getObjectId())) {
-                                    for (int j = 0; j < mUsers.size(); j++) {
-                                        mUserIds = mUsers.get(mPosition).getObjectId();
-                                    }
-                                    if (mUserIds.equals(request.get(ParseConstants.KEY_REQUEST_FROM))) {
-                                        request.deleteInBackground(new DeleteCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                Toast.makeText(EditContactsActivity.this,
-                                                        getString(R.string.request_deleted),
-                                                        Toast.LENGTH_SHORT).show();
-                                                if (e != null) {
-                                                    Toast.makeText(EditContactsActivity.this,
-                                                            getString(R.string.delete_request_failed),
-                                                            Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+            }
+        }
 
         mProgressDialog.dismiss();
 

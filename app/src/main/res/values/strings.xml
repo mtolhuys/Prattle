@@ -46,7 +46,8 @@
     <string name="requests">Requests</string>
     <string name="no_messages">No new messages!</string>
     <string name="no_contacts">Add contacts to begin!</string>
-    <string name="delete_success">Account successfully deleted!</string>
+    <string name="account_delete_success">Account successfully deleted!</string>
+    <string name="account_delete_failed">Deleting account failed</string>
     <string name="search_contacts">Search Contacts</string>
     <string name="search_key_label">Search</string>
     <string name="search_field_hint">Case Sensitive Search</string>
@@ -81,9 +82,13 @@
     <string name="delete_contact">Delete Contact</string>
     <string name="delete_request_contact_title">We found this user in our database!</string>
     <string name="delete_request_failed">Delete Request Failed</string>
-    <string name="request_deleted">Request Deleted</string>
-    <string name="check_no_results_found">No results found in check</string>
-    <string name="deleted_contact">Deleted Contact!</string>
     <string name="delete_contact_failed">Delete Contact Failed</string>
+    <string name="check_no_results_found">No results found in check</string>
+    <string name="request_deleted">Request Deleted</string>
+    <string name="contact_deleted">Deleted Contact!</string>
+    <string name="add_contact">Add Contact</string>
+    <string name="delete_request">Delete Request</string>
+    <string name="delete_success">Successfully Deleted!</string>
+    <string name="delete_failed">Failed to Delete</string>
 
 </resources>

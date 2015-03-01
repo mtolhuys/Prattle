@@ -61,7 +61,9 @@ public class RetrieveAccountActivity extends ActionBarActivity {
                                     }
                                     else {
                                     // Something went wrong. Look at the ParseException to see what's up.
-                                    AlertDialogs.overallAlert(RetrieveAccountActivity.this);
+                                    AlertDialogs.mailAlert(RetrieveAccountActivity.this);
+                                    Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(),
+                                            Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
