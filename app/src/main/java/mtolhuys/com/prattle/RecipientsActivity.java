@@ -129,36 +129,6 @@ public class RecipientsActivity extends ListActivity {
                         }
                     }
                 });
-
-//        ParseQuery<ParseUser> query = mContactRelation.getQuery();
-//        query.addAscendingOrder(ParseConstants.KEY_USERNAME);
-//        query.findInBackground(new FindCallback<ParseUser>() {
-//            @Override
-//            public void done(List<ParseUser> contacts, ParseException e) {
-//                mProgressDialog.dismiss();
-//                if (e == null) {
-//                    mRequests = contacts;
-//                    String[] usernames = new String[mRequests.size()];
-//                    int i = 0;
-//                    for (ParseUser user : mRequests) {
-//                        usernames[i] = user.getUsername();
-//                        i++;
-//                    }
-//                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-//                            getListView().getContext(),
-//                            android.R.layout.simple_list_item_checked,
-//                            usernames);
-//                    setListAdapter(adapter);
-//                } else {
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(getListView().getContext());
-//                    builder.setTitle(getString(R.string.oops_title))
-//                            .setMessage(e.getMessage())
-//                            .setPositiveButton(android.R.string.ok, null);
-//                    AlertDialog dialog = builder.create();
-//                    dialog.show();
-//                }
-//            }
-//        });
     }
 
     @Override
