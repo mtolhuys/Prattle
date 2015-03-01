@@ -46,7 +46,7 @@ public class InboxFragment extends ListFragment {
 
                     String[] usernames = new String[mMessages.size()];
                     int i = 0;
-                    for(ParseObject message : mMessages) {
+                    for (ParseObject message : mMessages) {
                         usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
                         i++;
                     }

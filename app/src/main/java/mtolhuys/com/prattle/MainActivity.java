@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
-    protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
+    protected String mCurrentUserName;
 
     public static final int TAKE_PHOTO_REQUEST = 0;
     public static final int PICK_PHOTO_REQUEST = 1;
@@ -166,10 +166,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         ParseAnalytics.trackAppOpened(getIntent());
 
-        if (mCurrentUser == null) {
+        if (ParseUser.getCurrentUser() == null) {
             goToLogin();
         } else {
-            Log.i(TAG, mCurrentUser.getUsername());
+            Log.i(TAG, ParseUser.getCurrentUser().getUsername());
         }
 
         // Set up the action bar.
@@ -347,22 +347,26 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         mProgressDialog.show();
 
-        ParseQuery.getQuery(ParseConstants.CLASS_ADD_REQUESTS)
-                .whereContains(ParseConstants.KEY_REQUEST_TO, ParseUser.getCurrentUser().getObjectId())
+        ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
+                .whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId())
                 .findInBackground(new FindCallback<ParseObject>() {
                     @Override
-                    public void done(List<ParseObject> requests, ParseException e) {
-                        if (e == null && requests != null) {
-
-                            for (int i = 0; i < requests.size(); i++) {
-                                ParseObject request = requests.get(i);
-                                request.deleteInBackground(new DeleteCallback() {
+                    public void done(List<ParseObject> contacts, ParseException e) {
+                        if (e == null && contacts != null) {
+                            for (int i = 0; i < contacts.size(); i++) {
+                                ParseObject contact = contacts.get(i);
+                                contact.deleteInBackground(new DeleteCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        if (e != null) {
+                                        if (e == null) {
                                             Toast.makeText(MainActivity.this,
-                                                    "Deleting Incoming Requests Failed...",
-                                                    Toast.LENGTH_LONG).show();
+                                                    getString(R.string.account_delete_success),
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                        else {
+                                            Toast.makeText(MainActivity.this,
+                                                    getString(R.string.account_delete_failed),
+                                                    Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
@@ -371,84 +375,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                     }
                 });
 
-        ParseQuery.getQuery(ParseConstants.CLASS_ADD_REQUESTS)
-                .whereContains(ParseConstants.KEY_REQUEST_FROM, ParseUser.getCurrentUser().getObjectId())
-                .findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> requests, ParseException e) {
-                        if (e == null && requests != null) {
-
-                            for (int i = 0; i < requests.size(); i++) {
-                                ParseObject request = requests.get(i);
-                                request.deleteInBackground(new DeleteCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e != null) {
-                                            Toast.makeText(MainActivity.this,
-                                                    "Deleting Outgoing Requests Failed",
-                                                    Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                });
-
-        ParseQuery<ParseObject> deleteMyContactList = ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS);
-        deleteMyContactList.whereContains(ParseConstants.KEY_RECIPIENT_ID, ParseUser.getCurrentUser().getObjectId());
-        deleteMyContactList.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> contacts, ParseException e) {
-
-                if (e == null && contacts != null) {
-
-                    for (int i = 0; i < contacts.size(); i++) {
-                        ParseObject contact = contacts.get(i);
-                        contact.deleteInBackground(new DeleteCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if (e != null) {
-                                    Toast.makeText(MainActivity.this,
-                                            "Deleting Contact List Failed",
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        });
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS);
-        query.whereContains(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> contacts, ParseException e) {
-
-                if (e == null && contacts != null) {
-
-                    for (int i = 0; i < contacts.size(); i++) {
-                        ParseObject contact = contacts.get(i);
-                        contact.deleteInBackground(new DeleteCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                Toast.makeText(MainActivity.this,
-                                        "Deleted Account!",
-                                        Toast.LENGTH_LONG).show();
-                                if (e != null) {
-                                    Toast.makeText(MainActivity.this,
-                                            "Delete Contact Failed",
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        });
-
-        mCurrentUser.deleteInBackground();
+        ParseUser.getCurrentUser().deleteInBackground();
         mProgressDialog.dismiss();
         goToLogin();
     }
