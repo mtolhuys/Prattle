@@ -36,6 +36,7 @@ public class ContactsFragment extends ListFragment {
 
     protected List<ParseObject> mContactsList;
     protected ParseObject mContact;
+    protected List<ParseObject> mChecks;
     protected String mCurrentUserId;
     protected String mCurrentUserName;
     protected List<String> mContactIds;
@@ -85,7 +86,7 @@ public class ContactsFragment extends ListFragment {
 
         ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
                 .setLimit(1000)
-                //.orderByAscending(ParseConstants.KEY_SENDER_NAME)
+                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
                 .whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId())
                 .findInBackground(new FindCallback<ParseObject>() {
                     @Override
@@ -97,20 +98,24 @@ public class ContactsFragment extends ListFragment {
 
                             mContactIds = new ArrayList<>();
                             mContactNames = new ArrayList<>();
+                            mChecks = new ArrayList<>();
 
                             int i;
 
                             for (i = 0; i < mContactsList.size(); i++) {
                                 mContact = mContactsList.get(i);
+
                                 // Find true status items, if true it's a contact of yours
                                 if (mContact.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
                                     if (mContact.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
+                                        mChecks.add(mContactsList.get(i));
                                     }
                                     if (mContact.getString(ParseConstants.KEY_SENDER_NAME)
                                             .equals(mCurrentUserName)) {
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_RECIPIENT_NAME));
+                                        mChecks.add(mContactsList.get(i));
                                     }
                                 }
                                 // Find false status items (meaning it's a request), only return sender name
@@ -118,6 +123,7 @@ public class ContactsFragment extends ListFragment {
                                     if (mContact.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
+                                        mChecks.add(mContactsList.get(i));
                                     }
                                 }
                                 if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
@@ -153,8 +159,8 @@ public class ContactsFragment extends ListFragment {
     }
 
     private void updateCheckMarks() {
-        for (int i = 0; i < mContactsList.size(); i++) {
-            if (mContactsList.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+        for (int i = 0; i < mContactNames.size(); i++) {
+            if (mChecks.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
                 getListView().setItemChecked(i, true);
             }
             else {
@@ -164,7 +170,8 @@ public class ContactsFragment extends ListFragment {
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, final int position, long id) {
+    public void onListItemClick
+        (ListView l, View v, final int position, long id) {
         super.onListItemClick(l, v, position, id);
 
         mPosition = position;
@@ -272,7 +279,7 @@ public class ContactsFragment extends ListFragment {
                                     });
                                 } else {
                                     Toast.makeText(getActivity(),
-                                            "Adding Recipient Info Failed",
+                                            "Adding Contact Failed",
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -282,17 +289,7 @@ public class ContactsFragment extends ListFragment {
                 .setNegativeButton(getString(R.string.no_button),
                         new DialogInterface.OnClickListener() {
                             public void onClick(final DialogInterface dialog, int id) {
-
-                                mProgressDialog.show();
-
-                                mContactsList.get(mPosition).deleteInBackground(new DeleteCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        mProgressDialog.dismiss();
-                                        updateList();
-                                        dialog.dismiss();
-                                    }
-                                });
+                                return;
                             }
                         });
         AlertDialog alert = builder.create();
