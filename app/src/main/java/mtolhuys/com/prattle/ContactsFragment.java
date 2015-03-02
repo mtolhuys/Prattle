@@ -36,7 +36,7 @@ public class ContactsFragment extends ListFragment {
 
     protected List<ParseObject> mContactsList;
     protected ParseObject mContact;
-    protected List<ParseObject> mChecks;
+    protected List<ParseObject> mContacts;
     protected String mCurrentUserId;
     protected String mCurrentUserName;
     protected List<String> mContactIds;
@@ -98,7 +98,7 @@ public class ContactsFragment extends ListFragment {
 
                             mContactIds = new ArrayList<>();
                             mContactNames = new ArrayList<>();
-                            mChecks = new ArrayList<>();
+                            mContacts = new ArrayList<>();
 
                             int i;
 
@@ -110,12 +110,12 @@ public class ContactsFragment extends ListFragment {
                                     if (mContact.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
-                                        mChecks.add(mContactsList.get(i));
+                                        mContacts.add(mContactsList.get(i));
                                     }
                                     if (mContact.getString(ParseConstants.KEY_SENDER_NAME)
                                             .equals(mCurrentUserName)) {
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_RECIPIENT_NAME));
-                                        mChecks.add(mContactsList.get(i));
+                                        mContacts.add(mContactsList.get(i));
                                     }
                                 }
                                 // Find false status items (meaning it's a request), only return sender name
@@ -123,7 +123,7 @@ public class ContactsFragment extends ListFragment {
                                     if (mContact.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
-                                        mChecks.add(mContactsList.get(i));
+                                        mContacts.add(mContactsList.get(i));
                                     }
                                 }
                                 if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
@@ -160,12 +160,7 @@ public class ContactsFragment extends ListFragment {
 
     private void updateCheckMarks() {
         for (int i = 0; i < mContactNames.size(); i++) {
-            if (mChecks.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
-                getListView().setItemChecked(i, true);
-            }
-            else {
-                getListView().setItemChecked(i, false);
-            }
+            getListView().setItemChecked(i, mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS));
         }
     }
 
@@ -301,7 +296,7 @@ public class ContactsFragment extends ListFragment {
 
         mProgressDialog.show();
 
-        mContactsList.get(mPosition).deleteInBackground(new DeleteCallback() {
+        mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
