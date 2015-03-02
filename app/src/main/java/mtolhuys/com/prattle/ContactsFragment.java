@@ -50,6 +50,7 @@ public class ContactsFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_contacts, container, false);
+
         return rootView;
     }
 
@@ -57,7 +58,9 @@ public class ContactsFragment extends ListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (ParseUser.getCurrentUser() == null) {
+        if (ParseUser.getCurrentUser() == null ||
+                ParseUser.getCurrentUser().getUsername() == null ||
+                ParseUser.getCurrentUser().getObjectId() == null) {
             goToLogin();
         } else {
             Log.i(TAG, ParseUser.getCurrentUser().getUsername());
@@ -296,21 +299,42 @@ public class ContactsFragment extends ListFragment {
 
         mProgressDialog.show();
 
-        mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Toast.makeText(getActivity(), getActivity().getString(R.string.delete_success),
-                            Toast.LENGTH_SHORT).show();
+        if (mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        Toast.makeText(getActivity(),
+                                "Contact Deleted!",
+                                Toast.LENGTH_SHORT).show();
+                    } else if (e != null) {
+                        Toast.makeText(getActivity(),
+                                "Deleting Contact Failed",
+                                Toast.LENGTH_SHORT).show();
+                        getListView().setItemChecked(mPosition, true);
+                    }
                     updateList();
                 }
-                if (e != null) {
-                    Toast.makeText(getActivity(), getActivity().getString(R.string.delete_failed),
-                            Toast.LENGTH_SHORT).show();
+            });
+        }
+        if (!mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        Toast.makeText(getActivity(),
+                                "Request Deleted!",
+                                Toast.LENGTH_SHORT).show();
+                    } else if (e != null) {
+                        Toast.makeText(getActivity(),
+                                "Deleting Request Failed",
+                                Toast.LENGTH_SHORT).show();
+                        getListView().setItemChecked(mPosition, true);
+                    }
                     updateList();
                 }
-            }
-        });
+            });
+        }
 
         mProgressDialog.dismiss();
 

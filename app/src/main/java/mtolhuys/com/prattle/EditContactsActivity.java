@@ -163,9 +163,6 @@ public class EditContactsActivity extends ListActivity {
                 }
             }
         });
-
-        mProgressDialog.dismiss();
-
     }
 
     @Override
@@ -187,42 +184,31 @@ public class EditContactsActivity extends ListActivity {
 
                     mContacts = contacts;
 
-                    if (contacts.size() > 0) {
-
-                    String[] userIds = new String[mUsers.size()];
                     mContactIds = new String[mContacts.size()];
 
-                        for (int i = 0; i < mContacts.size(); i++) {
-                            mContact = mContacts.get(i);
+                    for (int i = 0; i < mContacts.size(); i++) {
+                        mContact = mContacts.get(i);
 
-                            if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
-                                    .equals(mCurrentUserId)) {
-                                mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
-                            }
-                            if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(1)
-                                    .equals(mCurrentUserId)) {
-                                mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
-                            }
+                        if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
+                                .equals(mCurrentUserId)) {
+                            mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
                         }
-
-                        for (int i = 0; i < mUsers.size(); i++) {
-                            userIds[i] = mUsers.get(i).getObjectId();
+                        if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(1)
+                                .equals(mCurrentUserId)) {
+                            mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
                         }
-                        int i = 0;
-                        for (String user : userIds) {
-                            if (Arrays.asList(mContactIds).contains(user)) {
-                                getListView().setItemChecked(i, true);
-                            }
-                            i++;
-                        }
-
                     }
-                }
-                else if (e != null) {
+                    for (int i = 0; i < mUsers.size(); i++) {
+                        if (Arrays.asList(mContactIds).contains(mUsers.get(i).getObjectId())) {
+                            getListView().setItemChecked(i, true);
+                        }
+                    }
+                } else if (e != null) {
                     Log.e(TAG, e.getMessage());
                 }
             }
         });
+        mProgressDialog.dismiss();
     }
 
     @Override
@@ -303,27 +289,49 @@ public class EditContactsActivity extends ListActivity {
 
     private void delete() {
 
-        mProgressDialog.show();
+        String deleteId = mUsers.get(mPosition).getObjectId();
 
-        mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Toast.makeText(EditContactsActivity.this,
-                            getString(R.string.delete_success),
-                            Toast.LENGTH_SHORT).show();
-                } else if (e != null) {
-                    Toast.makeText(EditContactsActivity.this,
-                            getString(R.string.delete_failed),
-                            Toast.LENGTH_SHORT).show();
-                    getListView().setItemChecked(mPosition, true);
+        for (int i = 0; i < mContacts.size(); i++) {
+            if (Arrays.asList(mContactIds).get(i).contains(deleteId)) {
+                if (mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+                    mContacts.get(i).deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                Toast.makeText(EditContactsActivity.this,
+                                        "Contact Deleted!",
+                                        Toast.LENGTH_SHORT).show();
+                            } else if (e != null) {
+                                Toast.makeText(EditContactsActivity.this,
+                                        "Deleting Contact Failed",
+                                        Toast.LENGTH_SHORT).show();
+                                getListView().setItemChecked(mPosition, true);
+                            }
+                            updateList();
+                        }
+                    });
                 }
-                updateList();
+                if (!mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+                    mContacts.get(i).deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                Toast.makeText(EditContactsActivity.this,
+                                        "Request Deleted!",
+                                        Toast.LENGTH_SHORT).show();
+                            } else if (e != null) {
+                                Toast.makeText(EditContactsActivity.this,
+                                        "Deleting Request Failed",
+                                        Toast.LENGTH_SHORT).show();
+                                getListView().setItemChecked(mPosition, true);
+                            }
+                            updateList();
+                        }
+                    });
+                }
             }
-        });
-
+        }
         mProgressDialog.dismiss();
-
     }
 
     private void exceptionErrorAlert(ParseException e) {

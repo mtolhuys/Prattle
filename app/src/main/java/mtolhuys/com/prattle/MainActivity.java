@@ -166,7 +166,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         ParseAnalytics.trackAppOpened(getIntent());
 
-        if (ParseUser.getCurrentUser() == null) {
+        if (ParseUser.getCurrentUser() == null ||
+                ParseUser.getCurrentUser().getUsername() == null ||
+                ParseUser.getCurrentUser().getObjectId() == null) {
             goToLogin();
         } else {
             Log.i(TAG, ParseUser.getCurrentUser().getUsername());

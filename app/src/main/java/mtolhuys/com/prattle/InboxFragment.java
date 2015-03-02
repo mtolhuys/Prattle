@@ -1,7 +1,11 @@
 package mtolhuys.com.prattle;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +24,29 @@ import java.util.List;
  */
 public class InboxFragment extends ListFragment {
 
+    public static final String TAG = InboxFragment.class.getSimpleName();
+
     protected List<ParseObject> mMessages;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_inbox, container, false);
+
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (ParseUser.getCurrentUser() == null ||
+                ParseUser.getCurrentUser().getUsername() == null ||
+                ParseUser.getCurrentUser().getObjectId() == null) {
+            goToLogin();
+        } else {
+            Log.i(TAG, ParseUser.getCurrentUser().getUsername());
+        }
     }
 
     @Override
@@ -58,6 +78,13 @@ public class InboxFragment extends ListFragment {
                 }
             }
         });
+    }
+
+    private void goToLogin() {
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
 }
