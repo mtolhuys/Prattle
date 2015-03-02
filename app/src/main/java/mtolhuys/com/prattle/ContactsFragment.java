@@ -87,9 +87,12 @@ public class ContactsFragment extends ListFragment {
 
     private void updateList() {
 
+        mProgressDialog.show();
+
         ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
                 .setLimit(1000)
                 .orderByAscending(ParseConstants.KEY_SENDER_NAME)
+                .orderByAscending(ParseConstants.KEY_RECIPIENT_NAME)
                 .whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId())
                 .findInBackground(new FindCallback<ParseObject>() {
                     @Override
@@ -158,6 +161,8 @@ public class ContactsFragment extends ListFragment {
                         }
                     }
                 });
+
+        mProgressDialog.dismiss();
 
     }
 
