@@ -25,6 +25,8 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -41,6 +43,7 @@ public class ContactsFragment extends ListFragment {
     protected String mCurrentUserName;
     protected List<String> mContactIds;
     protected List<String> mContactNames;
+    protected List<String> mObjects;
     protected int mPosition;
     protected ListView mListView;
     protected ProgressDialog mProgressDialog;
@@ -58,24 +61,15 @@ public class ContactsFragment extends ListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (ParseUser.getCurrentUser() == null ||
-                ParseUser.getCurrentUser().getUsername() == null ||
-                ParseUser.getCurrentUser().getObjectId() == null) {
-            goToLogin();
-        } else {
-            Log.i(TAG, ParseUser.getCurrentUser().getUsername());
-        }
-
-        mCurrentUserName = ParseUser.getCurrentUser().getUsername();
-        mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
-
         mProgressDialog = new ProgressDialog(getActivity());
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage(getString(R.string.update_contacts));
 
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        updateList();
+        if (ParseUser.getCurrentUser() == null) {
+            goToLogin();
+        }
 
     }
 
@@ -89,9 +83,13 @@ public class ContactsFragment extends ListFragment {
 
         mProgressDialog.show();
 
+        mCurrentUserName = ParseUser.getCurrentUser().getUsername();
+        mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
+
+
         ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
                 .setLimit(1000)
-                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
+                .orderByAscending(ParseConstants.KEY_CREATED_AT)
                 .whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId())
                 .findInBackground(new FindCallback<ParseObject>() {
                     @Override
@@ -105,6 +103,8 @@ public class ContactsFragment extends ListFragment {
                             mContactNames = new ArrayList<>();
                             mContacts = new ArrayList<>();
 
+                            final String[] contactSorter = new String[mContactsList.size()];
+
                             int i;
 
                             for (i = 0; i < mContactsList.size(); i++) {
@@ -114,11 +114,13 @@ public class ContactsFragment extends ListFragment {
                                 if (mContact.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
                                     if (mContact.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
+                                        contactSorter[i] = mContact.getString(ParseConstants.KEY_SENDER_NAME);
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
                                         mContacts.add(mContactsList.get(i));
                                     }
                                     if (mContact.getString(ParseConstants.KEY_SENDER_NAME)
                                             .equals(mCurrentUserName)) {
+                                        contactSorter[i] = mContact.getString(ParseConstants.KEY_RECIPIENT_NAME);
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_RECIPIENT_NAME));
                                         mContacts.add(mContactsList.get(i));
                                     }
@@ -127,8 +129,8 @@ public class ContactsFragment extends ListFragment {
                                 if (!mContact.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
                                     if (mContact.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
+                                        contactSorter[i] = mContact.getString(ParseConstants.KEY_SENDER_NAME);
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
-                                        mContacts.add(mContactsList.get(i));
                                     }
                                 }
                                 if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)

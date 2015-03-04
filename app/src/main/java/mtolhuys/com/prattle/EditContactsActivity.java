@@ -176,7 +176,6 @@ public class EditContactsActivity extends ListActivity {
         contactQuery.setLimit(1000);
         contactQuery.orderByAscending(ParseConstants.KEY_SENDER_NAME);
         contactQuery.whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId());
-
         contactQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> contacts, ParseException e) {

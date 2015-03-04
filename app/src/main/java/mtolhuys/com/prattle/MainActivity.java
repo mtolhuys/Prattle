@@ -166,9 +166,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         ParseAnalytics.trackAppOpened(getIntent());
 
-        if (ParseUser.getCurrentUser() == null ||
-                ParseUser.getCurrentUser().getUsername() == null ||
-                ParseUser.getCurrentUser().getObjectId() == null) {
+        if (ParseUser.getCurrentUser() == null) {
             goToLogin();
         } else {
             Log.i(TAG, ParseUser.getCurrentUser().getUsername());
@@ -262,13 +260,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
+        // automatically handle clicks on the Home/Up button_right, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         switch (id) {
             case R.id.action_logout:
-                ParseUser.logOut();
+                logout();
                 goToLogin();
                 break;
 
@@ -312,7 +310,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             .setCancelable(false)
             .setPositiveButton(getString(R.string.yes_button), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    // if this button is clicked, close
+                    // if this button_right is clicked, close
                     // current activity
                     deleteAccountContactsAndRequests();
                     ParseUser.logOut();
@@ -320,7 +318,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             })
             .setNegativeButton(getString(R.string.no_button), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    // if this button is clicked, just close
+                    // if this button_right is clicked, just close
                     // the dialog box and do nothing
                     dialog.cancel();
                 }
@@ -343,6 +341,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    }
+
+    private void logout(){
+        ParseUser.logOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        this.finish();
     }
 
     private void deleteAccountContactsAndRequests() {

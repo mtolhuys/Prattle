@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
     <resources>
 
-    <!-- FONT-FAMILIES -->
+    <!-- TEXT STYLE -->
     <string name="font_family">fonts/Ubuntu-L.ttf</string>
+    <string name="button_text_color">#D6D7DA</string>
 
     <!-- ALERTDIALOGS -->
     <string name="oops_title">Oops!</string>
@@ -74,7 +75,7 @@
     <string name="forgot_password">Forgot your password?</string>
     <string name="title_activity_retrieve_account">Retrieve Account</string>
     <string name="hello_world">Hello world!</string>
-    <string name="reset_button">Reset Password</string>
+    <string name="reset_button">Reset</string>
     <string name="email_sent_message">E-mail succesfully sent, check your inbox!</string>
     <string name="back_to_login_button">Back to Login</string>
     <string name="no_requests">No Requests</string>

@@ -40,19 +40,24 @@ public class InboxFragment extends ListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (ParseUser.getCurrentUser() == null ||
-                ParseUser.getCurrentUser().getUsername() == null ||
-                ParseUser.getCurrentUser().getObjectId() == null) {
+        if (ParseUser.getCurrentUser() == null) {
             goToLogin();
-        } else {
-            Log.i(TAG, ParseUser.getCurrentUser().getUsername());
         }
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
+        if (ParseUser.getCurrentUser() == null) {
+            goToLogin();
+        }
+
+        updateList();
+    }
+
+    private void updateList() {
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(ParseConstants.CLASS_MESSAGES);
         query.whereEqualTo(ParseConstants.KEY_RECIPIENT_ID, ParseUser.getCurrentUser().getObjectId());
         query.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
