@@ -186,7 +186,6 @@ public class EditContactsActivity extends ListActivity {
 
         ParseQuery contactQuery = ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS);
         contactQuery.setLimit(1000);
-        contactQuery.orderByAscending(ParseConstants.KEY_SENDER_NAME);
         contactQuery.whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId());
         contactQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -243,13 +242,14 @@ public class EditContactsActivity extends ListActivity {
                                 public void done(ParseException e) {
                                     if (e == null) {
                                         Toast.makeText(EditContactsActivity.this,
-                                                "Contact Request Sent",
+                                                getString(R.string.request_sent),
                                                 Toast.LENGTH_SHORT).show();
+                                        getContacts();
                                         updateList();
                                     }
                                     else {
                                         Toast.makeText(EditContactsActivity.this,
-                                                "Contact Request Failed",
+                                                getString(R.string.request_sent_failed),
                                                 Toast.LENGTH_SHORT).show();
                                         mProgressDialog.dismiss();
                                     }
@@ -276,6 +276,8 @@ public class EditContactsActivity extends ListActivity {
                         public void onClick(DialogInterface dialog, int id) {
                             mProgressDialog.show();
                             delete();
+                            getContacts();
+                            updateList();
                             dialog.cancel();
                         }
                     })
@@ -303,33 +305,31 @@ public class EditContactsActivity extends ListActivity {
                         public void done(ParseException e) {
                             if (e == null) {
                                 Toast.makeText(EditContactsActivity.this,
-                                        "Contact Deleted!",
+                                        getString(R.string.contact_deleted),
                                         Toast.LENGTH_SHORT).show();
                             } else if (e != null) {
                                 Toast.makeText(EditContactsActivity.this,
-                                        "Deleting Contact Failed",
+                                        getString(R.string.delete_contact_failed),
                                         Toast.LENGTH_SHORT).show();
                                 getListView().setItemChecked(mPosition, true);
                             }
-                            updateList();
                         }
                     });
                 }
-                if (!mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+                else {
                     mContacts.get(i).deleteInBackground(new DeleteCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
                                 Toast.makeText(EditContactsActivity.this,
-                                        "Request Deleted!",
+                                        getString(R.string.request_deleted),
                                         Toast.LENGTH_SHORT).show();
                             } else if (e != null) {
                                 Toast.makeText(EditContactsActivity.this,
-                                        "Deleting Request Failed",
+                                        getString(R.string.delete_request_failed),
                                         Toast.LENGTH_SHORT).show();
                                 getListView().setItemChecked(mPosition, true);
                             }
-                            updateList();
                         }
                     });
                 }

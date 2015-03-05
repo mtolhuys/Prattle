@@ -21,8 +21,8 @@
         android:paddingBottom="10dp"
         android:paddingLeft="5dp"
         android:singleLine="true"
-        android:textColorHint="#68d93039"
-        android:textColor="#BE1716"
+        android:textColor="#fff1f2f5"
+        android:textColorHint="#c9fbfcff"
         android:hint="@string/username_hint"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -34,7 +34,6 @@
         android:inputType="textEmailAddress"
         android:hint="@string/email_hint"
         android:id="@+id/emailField"
-        android:background="#ffdddbe0"
         android:layout_marginLeft="@dimen/textfields_horizontal_margin"
         android:layout_marginRight="@dimen/textfields_horizontal_margin"
         android:layout_marginBottom="2dp"
@@ -42,8 +41,9 @@
         android:paddingBottom="10dp"
         android:paddingLeft="5dp"
         android:ems="10"
-        android:textColorHint="#68d93039"
-        android:textColor="#BE1716"
+        android:background="#2a4e5a5a"
+        android:textColor="#fff1f2f5"
+        android:textColorHint="#c9fbfcff"
         android:singleLine="true"
         android:layout_below="@+id/usernameField"
         android:layout_alignParentLeft="true"
@@ -57,7 +57,7 @@
         android:inputType="textPassword"
         android:id="@+id/passwordField"
         android:hint="@string/password_hint"
-        android:background="#ffdddbe0"
+
         android:layout_marginLeft="@dimen/textfields_horizontal_margin"
         android:layout_marginRight="@dimen/textfields_horizontal_margin"
         android:layout_marginBottom="2dp"
@@ -65,8 +65,9 @@
         android:paddingBottom="10dp"
         android:paddingLeft="5dp"
         android:ems="10"
-        android:textColorHint="#68d93039"
-        android:textColor="#BE1716"
+        android:background="#2a4e5a5a"
+        android:textColor="#fff1f2f5"
+        android:textColorHint="#c9fbfcff"
         android:layout_below="@+id/emailField"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -93,7 +94,7 @@
             android:id="@+id/signUpButton"
             android:layout_weight="1"
             android:layout_gravity="center_horizontal"
-            android:textColor="#D6D7DA"/>
+            android:textColor="#fff1f2f5"/>
 
         <Button
             android:layout_width="match_parent"
@@ -104,7 +105,7 @@
             android:id="@+id/backToLoginButton"
             android:layout_weight="1"
             android:layout_gravity="center_horizontal"
-            android:textColor="#D6D7DA"/>
+            android:textColor="#fff1f2f5"/>
 
     </LinearLayout>
 
@@ -114,7 +115,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/progressBar"
         android:textColor="#ffdddbe0"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_alignBottom="@+id/usernameField"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="44dp"/>
 
 </RelativeLayout>

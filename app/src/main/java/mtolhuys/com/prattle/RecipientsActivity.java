@@ -25,6 +25,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -35,14 +36,20 @@ public class RecipientsActivity extends ListActivity {
 
     public static final String TAG = RecipientsActivity.class.getSimpleName();
 
-    protected ParseObject mContact;
+    protected ContactsObject[] mContactObjects;
+    protected ContactsObject mContactsObject;
+    protected ParseObject mListitem;
     protected String mCurrentUserName;
+    protected String mContactName;
     protected String mCurrentUserId;
-    protected List<String> mContactIds;
+    protected String mContactId;
+    protected ParseObject mContact;
     protected List<String> mContactNames;
+    protected List<String> mContactIds;
+    protected List<ParseObject> mContacts;
     protected ParseRelation<ParseUser> mContactRelation;
     protected ParseUser mCurrentUser;
-    protected List<ParseObject> mContacts;
+    protected List<ParseObject> mContactsList;
     protected ProgressDialog mProgressDialog;
     protected Uri mMediaUri;
     protected String mFileType;
@@ -84,51 +91,62 @@ public class RecipientsActivity extends ListActivity {
 
         ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS)
                 .setLimit(1000)
-                .orderByAscending(ParseConstants.KEY_SENDER_NAME)
                 .whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId())
                 .findInBackground(new FindCallback<ParseObject>() {
                     @Override
                     public void done(List<ParseObject> contacts, ParseException e) {
-                        mProgressDialog.dismiss();
-
                         if (e == null && contacts != null) {
                             // We found messages!
-                            mContacts = contacts;
+                            mContactsList = contacts;
 
-                            mContactIds = new ArrayList<>();
-                            mContactNames = new ArrayList<>();
-                            int i = 0;
+                            mContactObjects = new ContactsObject[mContactsList.size()];
 
-                            for (i = 0; i < mContacts.size(); i++) {
-                                mContact = mContacts.get(i);
+                            for (int i = 0; i < mContactsList.size(); i++) {
+                                mListitem = mContactsList.get(i);
 
-                                if (mContact.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+                                if (mListitem.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
 
-                                    if (mContact.getString(ParseConstants.KEY_SENDER_NAME)
+                                    if (mListitem.getString(ParseConstants.KEY_SENDER_NAME)
                                             .equals(mCurrentUserName)) {
-                                        mContactNames.add(mContact.getString(ParseConstants.KEY_RECIPIENT_NAME));
-                                    }
-                                    else {
-                                        mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
+                                        mContactName = mListitem.getString(ParseConstants.KEY_RECIPIENT_NAME);
+                                        mContact = mListitem;
+                                    } else {
+                                        mContactName = mListitem.getString(ParseConstants.KEY_SENDER_NAME);
+                                        mContact = mListitem;
                                     }
 
-                                    if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
+                                    if (mListitem.getList(ParseConstants.KEY_USERS_IDS).get(0)
                                             .equals(mCurrentUserId)) {
-                                        mContactIds.add(mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString());
+                                        mContactId = mListitem.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
+                                    } else {
+                                        mContactId = mListitem.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
                                     }
-                                    else {
-                                        mContactIds.add(mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString());
-                                    }
+                                mContactsObject = new ContactsObject(mContactName, mContactId, mContact);
+                                mContactObjects[i] = mContactsObject;
                                 }
-                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                                        getListView().getContext(),
-                                        android.R.layout.simple_list_item_checked,
-                                        mContactNames);
-                                setListAdapter(adapter);
                             }
+                            if (mContactObjects.length >= 2) {
+                                Arrays.sort(mContactObjects, new ContactsComparator());
+                            }
+
+                            mContactNames = new ArrayList<>();
+                            mContactIds = new ArrayList<>();
+                            mContacts = new ArrayList<>();
+                            for (ContactsObject contact : mContactObjects) {
+                                mContactNames.add(contact.getContactName());
+                                mContactIds.add(contact.getContactId());
+                                mContacts.add(contact.getContact());
+                            }
+
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                    getListView().getContext(),
+                                    android.R.layout.simple_list_item_checked,
+                                    mContactNames);
+                            setListAdapter(adapter);
                         }
                     }
                 });
+        mProgressDialog.dismiss();
     }
 
     @Override
@@ -157,8 +175,7 @@ public class RecipientsActivity extends ListActivity {
                 ParseObject message = createMessage();
                 if (message == null) {
                     AlertDialogs.selectedFileAlert(this);
-                }
-                else {
+                } else {
                     send(message);
                     finish();
                 }
@@ -179,8 +196,7 @@ public class RecipientsActivity extends ListActivity {
 
         if (fileBytes == null) {
             return null;
-        }
-        else {
+        } else {
             if (mFileType.equals(ParseConstants.TYPE_IMAGE)) {
                 fileBytes = FileHelper.reduceImageForUpload(fileBytes);
             }
@@ -211,8 +227,7 @@ public class RecipientsActivity extends ListActivity {
 
         if (l.getCheckedItemCount() > 0) {
             mSendMenuItem.setVisible(true);
-        }
-        else {
+        } else {
             mSendMenuItem.setVisible(false);
         }
     }
@@ -223,9 +238,8 @@ public class RecipientsActivity extends ListActivity {
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(RecipientsActivity.this, getString(R.string.message_sent)
-                                                          , Toast.LENGTH_SHORT).show();
-                }
-                else {
+                            , Toast.LENGTH_SHORT).show();
+                } else {
                     AlertDialogs.sendMessageErrorAlert(RecipientsActivity.this);
                 }
             }

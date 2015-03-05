@@ -14,6 +14,7 @@
     <string name="delete_confirmation">Are you sure you want to delete your account?</string>
     <string name="selected_file_alert_message">There was an error with the selected file. Please select a different file.</string>
     <string name="sending_message_error_alert">There was an error sending your message. Please try again!</string>
+    <string name="delete_request_contact_title">We found this user in our database!</string>
     <string name="delete_request_contact_question">There either is an open request or this user is already a contact of yours. Do you want to delete the request or contact?</string>
     <string name="login_error_message">Please make sure you enter a username and password!</string>
     <string name="search_same_as_user">Search item is the same as current username.</string>
@@ -81,7 +82,6 @@
     <string name="no_requests">No Requests</string>
     <string name="send_message">Send Message</string>
     <string name="delete_contact">Delete Contact</string>
-    <string name="delete_request_contact_title">We found this user in our database!</string>
     <string name="delete_request_failed">Delete Request Failed</string>
     <string name="delete_contact_failed">Delete Contact Failed</string>
     <string name="check_no_results_found">No results found in check</string>
@@ -91,5 +91,9 @@
     <string name="delete_request">Delete Request</string>
     <string name="delete_success">Successfully Deleted!</string>
     <string name="delete_failed">Failed to Delete</string>
+    <string name="request_sent">Contact Request Sent</string>
+    <string name="request_sent_failed">Contact Request Failed</string>
+    <string name="added_contact">Added Contact!</string>
+    <string name="adding_contact_failed">Adding Contact Failed</string>
 
 </resources>
