@@ -103,20 +103,20 @@ public class RecipientsActivity extends ListActivity {
                                 mContact = mContacts.get(i);
 
                                 if (mContact.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+
                                     if (mContact.getString(ParseConstants.KEY_SENDER_NAME)
                                             .equals(mCurrentUserName)) {
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_RECIPIENT_NAME));
                                     }
-                                    if (mContact.getString(ParseConstants.KEY_RECIPIENT_NAME)
-                                            .equals(mCurrentUserName)) {
+                                    else {
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
                                     }
+
                                     if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
                                             .equals(mCurrentUserId)) {
                                         mContactIds.add(mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString());
                                     }
-                                    if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(1)
-                                            .equals(mCurrentUserId)) {
+                                    else {
                                         mContactIds.add(mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString());
                                     }
                                 }

@@ -43,7 +43,6 @@ public class ContactsFragment extends ListFragment {
     protected String mCurrentUserName;
     protected List<String> mContactIds;
     protected List<String> mContactNames;
-    protected List<String> mObjects;
     protected int mPosition;
     protected ListView mListView;
     protected ProgressDialog mProgressDialog;
@@ -103,8 +102,6 @@ public class ContactsFragment extends ListFragment {
                             mContactNames = new ArrayList<>();
                             mContacts = new ArrayList<>();
 
-                            final String[] contactSorter = new String[mContactsList.size()];
-
                             int i;
 
                             for (i = 0; i < mContactsList.size(); i++) {
@@ -114,13 +111,10 @@ public class ContactsFragment extends ListFragment {
                                 if (mContact.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
                                     if (mContact.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
-                                        contactSorter[i] = mContact.getString(ParseConstants.KEY_SENDER_NAME);
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
                                         mContacts.add(mContactsList.get(i));
                                     }
-                                    if (mContact.getString(ParseConstants.KEY_SENDER_NAME)
-                                            .equals(mCurrentUserName)) {
-                                        contactSorter[i] = mContact.getString(ParseConstants.KEY_RECIPIENT_NAME);
+                                    else {
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_RECIPIENT_NAME));
                                         mContacts.add(mContactsList.get(i));
                                     }
@@ -129,18 +123,19 @@ public class ContactsFragment extends ListFragment {
                                 if (!mContact.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
                                     if (mContact.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
-                                        contactSorter[i] = mContact.getString(ParseConstants.KEY_SENDER_NAME);
                                         mContactNames.add(mContact.getString(ParseConstants.KEY_SENDER_NAME));
+                                        mContacts.add(mContactsList.get(i));
                                     }
                                 }
+
                                 if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
                                         .equals(mCurrentUserId)) {
                                     mContactIds.add(mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString());
                                 }
-                                if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(1)
-                                        .equals(mCurrentUserId)) {
+                                else {
                                     mContactIds.add(mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString());
                                 }
+                                Log.e(TAG, "Contacts: " + mContacts.get(i));
                             }
 
                             mArrayAdapter = new ArrayAdapter<>(
@@ -148,7 +143,11 @@ public class ContactsFragment extends ListFragment {
                                     android.R.layout.simple_list_item_checked,
                                     mContactNames);
                             setListAdapter(mArrayAdapter);
-                            updateCheckMarks();
+
+                            // Set checkmarks to contacts (where contact-status equals true)
+                            for (i = 0; i < mContactNames.size(); i++) {
+                                getListView().setItemChecked(i, mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS));
+                            }
 
                         }
                         else {
@@ -167,12 +166,6 @@ public class ContactsFragment extends ListFragment {
 
     }
 
-    private void updateCheckMarks() {
-        for (int i = 0; i < mContactNames.size(); i++) {
-            getListView().setItemChecked(i, mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS));
-        }
-    }
-
     @Override
     public void onListItemClick
         (ListView l, View v, final int position, long id) {
@@ -181,6 +174,7 @@ public class ContactsFragment extends ListFragment {
         mPosition = position;
         mListView = l;
 
+        // With a request, only options add contact and delete are available
         if (getListView().isItemChecked(mPosition)) {
             final String[] items = new String[]{getString(R.string.add_contact),
                     getString(R.string.delete_request)};
@@ -197,6 +191,7 @@ public class ContactsFragment extends ListFragment {
             }).show();
         }
 
+        // With a contact, only options send message and delete are available
         if (!getListView().isItemChecked(mPosition)) {
             getListView().setItemChecked(mPosition, true);
             final String[] items = new String[]{getString(R.string.send_message),
@@ -305,42 +300,61 @@ public class ContactsFragment extends ListFragment {
 
         mProgressDialog.show();
 
-        if (mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
-            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
+        String deleteId = mContacts.get(mPosition).getObjectId();
+
+        for (int i = 0; i < mContacts.size(); i++) {
+            if (Arrays.asList(mContactIds).get(i).contains(deleteId)) {
+                if (mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
                         Toast.makeText(getActivity(),
-                                "Contact Deleted!",
+                                mContacts.get(i).getObjectId() + " Deleted!",
                                 Toast.LENGTH_SHORT).show();
-                    } else if (e != null) {
-                        Toast.makeText(getActivity(),
-                                "Deleting Contact Failed",
-                                Toast.LENGTH_SHORT).show();
-                        getListView().setItemChecked(mPosition, true);
-                    }
-                    updateList();
+
                 }
-            });
-        }
-        if (!mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
-            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        Toast.makeText(getActivity(),
-                                "Request Deleted!",
-                                Toast.LENGTH_SHORT).show();
-                    } else if (e != null) {
-                        Toast.makeText(getActivity(),
-                                "Deleting Request Failed",
-                                Toast.LENGTH_SHORT).show();
-                        getListView().setItemChecked(mPosition, true);
+                if (!mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+                    Toast.makeText(getActivity(),
+                            mContacts.get(i).getObjectId() + " Deleted!",
+                            Toast.LENGTH_SHORT).show();
+                        }
                     }
-                    updateList();
                 }
-            });
-        }
+
+
+//        if (mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+//            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
+//                @Override
+//                public void done(ParseException e) {
+//                    if (e == null) {
+//                        Toast.makeText(getActivity(),
+//                                "Contact Deleted!",
+//                                Toast.LENGTH_SHORT).show();
+//                    } else if (e != null) {
+//                        Toast.makeText(getActivity(),
+//                                "Deleting Contact Failed",
+//                                Toast.LENGTH_SHORT).show();
+//                        getListView().setItemChecked(mPosition, true);
+//                    }
+//                    updateList();
+//                }
+//            });
+//        }
+//        if (!mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+//            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
+//                @Override
+//                public void done(ParseException e) {
+//                    if (e == null) {
+//                        Toast.makeText(getActivity(),
+//                                "Request Deleted!",
+//                                Toast.LENGTH_SHORT).show();
+//                    } else if (e != null) {
+//                        Toast.makeText(getActivity(),
+//                                "Deleting Request Failed",
+//                                Toast.LENGTH_SHORT).show();
+//                        getListView().setItemChecked(mPosition, true);
+//                    }
+//                    updateList();
+//                }
+//            });
+//        }
 
         mProgressDialog.dismiss();
 

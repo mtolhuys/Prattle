@@ -66,6 +66,8 @@ public class EditContactsActivity extends ListActivity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setIcon(android.R.color.transparent);
 
+        getContacts();
+
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -121,12 +123,12 @@ public class EditContactsActivity extends ListActivity {
 
         final String searchItem = mSearchField.getText().toString().trim();
 
-        final ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.orderByAscending(ParseConstants.KEY_USERNAME);
-        query.setLimit(1000);
-        query.whereContains(ParseConstants.KEY_USERNAME, searchItem);
-        query.whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUserName);
-        query.findInBackground(new FindCallback<ParseUser>() {
+        ParseUser.getQuery()
+                .setLimit(1000)
+                .orderByAscending(ParseConstants.KEY_USERNAME)
+                .whereContains(ParseConstants.KEY_USERNAME, searchItem)
+                .whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUserName)
+                .findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
 
@@ -156,13 +158,23 @@ public class EditContactsActivity extends ListActivity {
                             android.R.layout.simple_list_item_checked,
                             usernames);
                     setListAdapter(mAdapter);
-                    addContactCheckmarks();
+                    // Add Contact Checkmarks
+                    for (i = 0; i < mUsers.size(); i++) {
+                        if (mContactIds != null) {
+                            if (Arrays.asList(mContactIds).contains(mUsers.get(i).getObjectId())) {
+                                getListView().setItemChecked(i, true);
+                            }
+                        }
+                    }
                 } else {
                     Log.e(TAG, e.getMessage());
                     exceptionErrorAlert(e);
                 }
             }
         });
+
+        mProgressDialog.dismiss();
+
     }
 
     @Override
@@ -170,7 +182,7 @@ public class EditContactsActivity extends ListActivity {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    private void addContactCheckmarks() {
+    private void getContacts() {
 
         ParseQuery contactQuery = ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS);
         contactQuery.setLimit(1000);
@@ -192,14 +204,8 @@ public class EditContactsActivity extends ListActivity {
                                 .equals(mCurrentUserId)) {
                             mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
                         }
-                        if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(1)
-                                .equals(mCurrentUserId)) {
+                        else{
                             mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
-                        }
-                    }
-                    for (int i = 0; i < mUsers.size(); i++) {
-                        if (Arrays.asList(mContactIds).contains(mUsers.get(i).getObjectId())) {
-                            getListView().setItemChecked(i, true);
                         }
                     }
                 } else if (e != null) {
@@ -207,7 +213,6 @@ public class EditContactsActivity extends ListActivity {
                 }
             }
         });
-        mProgressDialog.dismiss();
     }
 
     @Override
