@@ -6,7 +6,7 @@ import java.util.Comparator;
  * Created by mtolhuys on 05/03/15.
  */
 public class ContactsComparator implements Comparator<ContactsObject> {
-    public int compare(ContactsObject name1, ContactsObject name2) {
-        return (name1.getContactName().toUpperCase()).compareTo((name2.getContactName().toUpperCase()));
+    public int compare(ContactsObject f1, ContactsObject f2) {
+        return (f1.getContactName().toUpperCase()).compareTo((f2.getContactName().toUpperCase()));
     }
 }

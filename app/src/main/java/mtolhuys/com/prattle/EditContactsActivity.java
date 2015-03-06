@@ -66,8 +66,6 @@ public class EditContactsActivity extends ListActivity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setIcon(android.R.color.transparent);
 
-        getContacts();
-
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -115,18 +113,18 @@ public class EditContactsActivity extends ListActivity {
 
     }
 
-    private void updateList() {
+    private void search() {
         mProgressBar.setVisibility(View.VISIBLE);
         mNoResult.setVisibility(View.INVISIBLE);
 
         mProgressDialog.show();
 
-        final String searchItem = mSearchField.getText().toString().trim();
+        final String searchItem = mSearchField.getText().toString().trim().toLowerCase();
 
         ParseUser.getQuery()
                 .setLimit(1000)
                 .orderByAscending(ParseConstants.KEY_USERNAME)
-                .whereContains(ParseConstants.KEY_USERNAME, searchItem)
+                .whereContains(ParseConstants.KEY_SEARCH_NAME, searchItem)
                 .whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUserName)
                 .findInBackground(new FindCallback<ParseUser>() {
             @Override
@@ -182,7 +180,7 @@ public class EditContactsActivity extends ListActivity {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    private void getContacts() {
+    private void updateList() {
 
         ParseQuery contactQuery = ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS);
         contactQuery.setLimit(1000);
@@ -202,13 +200,14 @@ public class EditContactsActivity extends ListActivity {
                         if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
                                 .equals(mCurrentUserId)) {
                             mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
-                        }
-                        else{
+                        } else {
                             mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
                         }
                     }
-                } else if (e != null) {
-                    Log.e(TAG, e.getMessage());
+                    search();
+                }
+                else {
+                    search();
                 }
             }
         });
@@ -244,7 +243,6 @@ public class EditContactsActivity extends ListActivity {
                                         Toast.makeText(EditContactsActivity.this,
                                                 getString(R.string.request_sent),
                                                 Toast.LENGTH_SHORT).show();
-                                        getContacts();
                                         updateList();
                                     }
                                     else {
@@ -276,7 +274,6 @@ public class EditContactsActivity extends ListActivity {
                         public void onClick(DialogInterface dialog, int id) {
                             mProgressDialog.show();
                             delete();
-                            getContacts();
                             updateList();
                             dialog.cancel();
                         }

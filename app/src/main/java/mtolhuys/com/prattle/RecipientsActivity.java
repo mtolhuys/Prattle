@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,7 +24,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -36,8 +35,11 @@ public class RecipientsActivity extends ListActivity {
 
     public static final String TAG = RecipientsActivity.class.getSimpleName();
 
-    protected ContactsObject[] mContactObjects;
-    protected ContactsObject mContactsObject;
+    protected List<ContactsObject> mContactObjects;
+    protected ContactsObject mContactObject;
+    protected List<ParseObject> mItem;
+    protected List<String> mNames;
+    protected List<String> mIds;
     protected ParseObject mListitem;
     protected String mCurrentUserName;
     protected String mContactName;
@@ -99,34 +101,42 @@ public class RecipientsActivity extends ListActivity {
                             // We found messages!
                             mContactsList = contacts;
 
-                            mContactObjects = new ContactsObject[mContactsList.size()];
+                            mItem = new ArrayList<ParseObject>();
+                            mNames = new ArrayList<String>();
+                            mIds = new ArrayList<String>();
 
                             for (int i = 0; i < mContactsList.size(); i++) {
                                 mListitem = mContactsList.get(i);
 
                                 if (mListitem.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
-
-                                    if (mListitem.getString(ParseConstants.KEY_SENDER_NAME)
+                                    if (mListitem.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
-                                        mContactName = mListitem.getString(ParseConstants.KEY_RECIPIENT_NAME);
-                                        mContact = mListitem;
+                                        mItem.add(mListitem);
+                                        mNames.add(mListitem.getString(ParseConstants.KEY_SENDER_NAME));
                                     } else {
-                                        mContactName = mListitem.getString(ParseConstants.KEY_SENDER_NAME);
-                                        mContact = mListitem;
+                                        mItem.add(mListitem);
+                                        mNames.add(mListitem.getString(ParseConstants.KEY_RECIPIENT_NAME));
                                     }
-
                                     if (mListitem.getList(ParseConstants.KEY_USERS_IDS).get(0)
                                             .equals(mCurrentUserId)) {
-                                        mContactId = mListitem.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
+                                        mIds.add(mListitem.getList(ParseConstants.KEY_USERS_IDS).get(1).toString());
                                     } else {
-                                        mContactId = mListitem.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
+                                        mIds.add(mListitem.getList(ParseConstants.KEY_USERS_IDS).get(0).toString());
                                     }
-                                mContactsObject = new ContactsObject(mContactName, mContactId, mContact);
-                                mContactObjects[i] = mContactsObject;
                                 }
                             }
-                            if (mContactObjects.length >= 2) {
-                                Arrays.sort(mContactObjects, new ContactsComparator());
+
+                            mContactObjects = new ArrayList<ContactsObject>();
+                            for (int i = 0; i < mItem.size(); i++) {
+                                mContactName = mNames.get(i);
+                                mContactId = mIds.get(i);
+                                mContact = mItem.get(i);
+                                mContactObject = new ContactsObject(mContactName, mContactId, mContact);
+                                mContactObjects.add(mContactObject);
+                            }
+
+                            if (mContactObjects.size() >= 2) {
+                                Collections.sort(mContactObjects, new ContactsComparator());
                             }
 
                             mContactNames = new ArrayList<>();

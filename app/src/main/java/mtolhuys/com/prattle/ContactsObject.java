@@ -2,9 +2,6 @@ package mtolhuys.com.prattle;
 
 import com.parse.ParseObject;
 
-import java.util.List;
-import java.util.SimpleTimeZone;
-
 /**
  * Created by mtolhuys on 05/03/15.
  */
@@ -24,19 +21,22 @@ public class ContactsObject {
     public String getContactName() {
         return contactName;
     }
-//    public void setContactName(String contactName) {
-//        this.contactName = contactName;
-//    }
+
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+    }
     public String getContactId() {
         return contactId;
     }
-//    public void setContactId(String contactId) {
-//        this.contactId = contactId;
-//    }
+
+    public void setContactId(String contactId) {
+        this.contactId = contactId;
+    }
     public ParseObject getContact() {
         return object;
     }
-//    public void setContact(ParseObject object) {
-//        this.object = object;
-//    }
+
+    public void setContact(ParseObject object) {
+        this.object = object;
+    }
 }

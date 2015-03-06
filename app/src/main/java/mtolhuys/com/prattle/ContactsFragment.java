@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
@@ -26,7 +25,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,10 +35,13 @@ public class ContactsFragment extends ListFragment {
 
     public static final String TAG = ContactsFragment.class.getSimpleName();
 
-    protected ContactsObject[] mContactObjects;
-    protected ContactsObject mContactsObject;
+    protected List<ContactsObject> mContactObjects;
+    protected ContactsObject mContactObject;
     protected List<ParseObject> mContactsList;
-    protected ParseObject mListitem;
+    protected List<ParseObject> mItem;
+    protected List<String> mNames;
+    protected List<String> mIds;
+    protected ParseObject mListItem;
     protected String mContactName;
     protected String mContactId;
     protected ParseObject mContact;
@@ -102,67 +104,81 @@ public class ContactsFragment extends ListFragment {
                             // We found contacts!
                             mContactsList = contacts;
 
-                            mContactObjects = new ContactsObject[mContactsList.size()];
+                            mItem = new ArrayList<ParseObject>();
+                            mNames = new ArrayList<String>();
+                            mIds = new ArrayList<String>();
 
+                            // Filter the query
                             for (int i = 0; i < mContactsList.size(); i++) {
-                                mListitem = mContactsList.get(i);
+                                mListItem = mContactsList.get(i);
 
                                 // Find true status items, if true it's a contact of yours
-                                if (mListitem.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
-                                    if (mListitem.getString(ParseConstants.KEY_RECIPIENT_NAME)
+                                if (mListItem.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+                                    if (mListItem.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
-                                        mContactName = mListitem.getString(ParseConstants.KEY_SENDER_NAME);
-                                        mContact = mListitem;
+                                        mItem.add(mListItem);
+                                        mNames.add(mListItem.getString(ParseConstants.KEY_SENDER_NAME));
                                     } else {
-                                        mContactName = mListitem.getString(ParseConstants.KEY_RECIPIENT_NAME);
-                                        mContact = mListitem;
+                                        mItem.add(mListItem);
+                                        mNames.add(mListItem.getString(ParseConstants.KEY_RECIPIENT_NAME));
+                                    }
+                                    if (mListItem.getList(ParseConstants.KEY_USERS_IDS).get(0)
+                                            .equals(mCurrentUserId)) {
+                                        mIds.add(mListItem.getList(ParseConstants.KEY_USERS_IDS).get(1).toString());
+                                    } else {
+                                        mIds.add(mListItem.getList(ParseConstants.KEY_USERS_IDS).get(0).toString());
                                     }
                                 }
-                                // Find false status items (meaning it's a request), only return sender name
-                                if (!mListitem.getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
-                                    if (mListitem.getString(ParseConstants.KEY_RECIPIENT_NAME)
+                                // Find false status items (meaning it's a request),
+                                // I want to hide outgoing requests in the contacts list,
+                                // therefore only return sender name
+                                else {
+                                    if (mListItem.getString(ParseConstants.KEY_RECIPIENT_NAME)
                                             .equals(mCurrentUserName)) {
-                                        mContactName = mListitem.getString(ParseConstants.KEY_SENDER_NAME);
-                                        mContact = mListitem;
-                                    } else {
-                                        mContactName = mListitem.getString(ParseConstants.KEY_RECIPIENT_NAME);
-                                        mContact = mListitem;
+                                        mItem.add(mListItem);
+                                        mNames.add(mListItem.getString(ParseConstants.KEY_SENDER_NAME));
+                                        if (mListItem.getList(ParseConstants.KEY_USERS_IDS).get(0)
+                                                .equals(mCurrentUserId)) {
+                                            mIds.add(mListItem.getList(ParseConstants.KEY_USERS_IDS).get(1).toString());
+                                        } else {
+                                            mIds.add(mListItem.getList(ParseConstants.KEY_USERS_IDS).get(0).toString());
+                                        }
                                     }
                                 }
-
-                                if (mListitem.getList(ParseConstants.KEY_USERS_IDS).get(0)
-                                        .equals(mCurrentUserId)) {
-                                    mContactId = mListitem.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
-                                } else {
-                                    mContactId = mListitem.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
-                                }
-                                mContactsObject = new ContactsObject(mContactName, mContactId, mContact);
-                                mContactObjects[i] = mContactsObject;
                             }
-                            // Only show contacts and incoming requests, hide outgoing requests
-                            if (mContactObjects.length >= 2) {
-                                // Order the list, since I use 2 name collumns (senders & recipients),
-                                // I can't use the ParseQuery orderBy method. Therefore this method...
-                                Arrays.sort(mContactObjects, new ContactsComparator());
+                            // Obtain all items
+                            mContactObjects = new ArrayList<ContactsObject>();
+                            for (int i = 0; i < mItem.size(); i++) {
+                                mContactName = mNames.get(i);
+                                mContactId = mIds.get(i);
+                                mContact = mItem.get(i);
+                                mContactObject = new ContactsObject(mContactName, mContactId, mContact);
+                                mContactObjects.add(mContactObject);
                             }
-                                mContactNames = new ArrayList<>();
-                                mContactIds = new ArrayList<>();
-                                mContacts = new ArrayList<>();
-                                for (ContactsObject contact : mContactObjects) {
-                                    mContactNames.add(contact.getContactName());
-                                    mContactIds.add(contact.getContactId());
-                                    mContacts.add(contact.getContact());
-                                }
-                                mArrayAdapter = new ArrayAdapter<>(
-                                        getListView().getContext(),
-                                        android.R.layout.simple_list_item_checked,
-                                        mContactNames);
-                                setListAdapter(mArrayAdapter);
+                            // If there are 2 or more Items, Order the list.
+                            // Since I use 2 name collumns (senders & recipients),
+                            // I can't use the ParseQuery orderBy method. Therefore this method...
+                            if (mContactObjects.size() >= 2) {
+                                Collections.sort(mContactObjects, new ContactsComparator());
+                            }
+                            mContactNames = new ArrayList<>();
+                            mContactIds = new ArrayList<>();
+                            mContacts = new ArrayList<>();
+                            for (ContactsObject contact : mContactObjects) {
+                                mContactNames.add(contact.getContactName());
+                                mContactIds.add(contact.getContactId());
+                                mContacts.add(contact.getContact());
+                            }
+                            mArrayAdapter = new ArrayAdapter<>(
+                                    getListView().getContext(),
+                                    android.R.layout.simple_list_item_checked,
+                                    mContactNames);
+                            setListAdapter(mArrayAdapter);
 
-                                // Set checkmarks to contacts (where contact-status equals true)
-                                for (int i = 0; i < mContacts.size(); i++) {
-                                    getListView().setItemChecked(i, mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS));
-                                }
+                            // Set checkmarks to contacts (where contact-status equals true)
+                            for (int i = 0; i < mContacts.size(); i++) {
+                                getListView().setItemChecked(i, mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS));
+                            }
                         } else {
                             Log.e(TAG, e.getMessage());
                             AlertDialog.Builder builder = new AlertDialog.Builder(getListView().getContext());
@@ -312,18 +328,6 @@ public class ContactsFragment extends ListFragment {
     }
 
     private void delete() {
-
-        if (mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
-            Toast.makeText(getActivity(),
-                    mContactNames.get(mPosition) + " Deleted!",
-                    Toast.LENGTH_SHORT).show();
-
-        }
-        if (!mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
-            Toast.makeText(getActivity(),
-                    mContactNames.get(mPosition) + " Deleted!",
-                    Toast.LENGTH_SHORT).show();
-        }
 
         mProgressDialog.show();
 

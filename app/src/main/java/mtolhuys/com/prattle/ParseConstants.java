@@ -12,6 +12,7 @@ public final class ParseConstants {
 
     // Field Names
     public static final String KEY_USERNAME = "username";
+    public static final String KEY_SEARCH_NAME = "searchName";
     public static final String KEY_CONTACT_RELATION = "contactRelation";
     public static final String KEY_CONTACT_STATUS = "status";
     public static final String KEY_USERS_IDS = "usersIds";
