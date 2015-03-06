@@ -7,5 +7,5 @@
         android:title="@string/action_bar_send_button"
         android:showAsAction="always"
         android:visible="false"
-        android:icon="@drawable/ic_action_email"/>
+        android:icon="@drawable/ic_message"/>
 </menu>

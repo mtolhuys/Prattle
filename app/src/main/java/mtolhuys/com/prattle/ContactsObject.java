@@ -25,6 +25,7 @@ public class ContactsObject {
     public void setContactName(String contactName) {
         this.contactName = contactName;
     }
+
     public String getContactId() {
         return contactId;
     }
@@ -32,6 +33,7 @@ public class ContactsObject {
     public void setContactId(String contactId) {
         this.contactId = contactId;
     }
+
     public ParseObject getContact() {
         return object;
     }

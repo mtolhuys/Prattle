@@ -21,7 +21,7 @@
         android:layout_marginBottom="2dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:paddingLeft="5dp"
+        android:paddingLeft="10dp"
         android:ems="10"
         android:textColor="#fff1f2f5"
         android:textColorHint="#c9fbfcff"

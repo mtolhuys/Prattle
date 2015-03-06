@@ -44,7 +44,6 @@ public class EditContactsActivity extends ListActivity {
     protected ParseRelation<ParseUser> mContactRelation;
     protected ParseUser mCurrentUser;
     protected ParseObject mContact;
-    protected ParseObject mRequest;
     protected ProgressBar mProgressBar;
     protected ProgressDialog mProgressDialog;
     protected EditText mSearchField;
@@ -90,7 +89,7 @@ public class EditContactsActivity extends ListActivity {
         mSearchField = (EditText) findViewById(R.id.searchUser);
         mSearchButton = (ImageButton) findViewById(R.id.searchButton);
 
-        mSearchField.setImeActionLabel(getString(R.string.search_key_label), KeyEvent.KEYCODE_ENTER);
+        mSearchField.setImeActionLabel(getString(R.string.search), KeyEvent.KEYCODE_ENTER);
         mSearchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

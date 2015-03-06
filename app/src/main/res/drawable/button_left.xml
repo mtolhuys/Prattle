@@ -10,8 +10,8 @@
     <item android:state_focused="true">
         <shape android:shape="rectangle"  >
             <corners android:bottomLeftRadius="7dip"/>
-            <stroke android:width="1dip" android:color="#D6D7DA" />
-            <solid android:color="#D6D7DA"/>
+            <stroke android:width="1dip" android:color="#ba3e393b" />
+            <solid android:color="#ba3e393b"/>
         </shape>
     </item>
     <item >

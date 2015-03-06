@@ -155,7 +155,7 @@ public class ContactsFragment extends ListFragment {
                                 mContactObject = new ContactsObject(mContactName, mContactId, mContact);
                                 mContactObjects.add(mContactObject);
                             }
-                            // If there are 2 or more Items, Order the list.
+                            // If there are 2 or more Items, Order the list alphabetically.
                             // Since I use 2 name collumns (senders & recipients),
                             // I can't use the ParseQuery orderBy method. Therefore this method...
                             if (mContactObjects.size() >= 2) {
@@ -179,7 +179,8 @@ public class ContactsFragment extends ListFragment {
                             for (int i = 0; i < mContacts.size(); i++) {
                                 getListView().setItemChecked(i, mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS));
                             }
-                        } else {
+                        }
+                        else {
                             Log.e(TAG, e.getMessage());
                             AlertDialog.Builder builder = new AlertDialog.Builder(getListView().getContext());
                             builder.setMessage(e.getMessage())
@@ -207,8 +208,8 @@ public class ContactsFragment extends ListFragment {
         if (getListView().isItemChecked(mPosition)) {
             final String[] items = new String[]{getString(R.string.add_contact),
                     getString(R.string.delete_request)};
-            final Integer[] icons = new Integer[]{R.drawable.ic_action_add_person,
-                    R.drawable.ic_action_discard};
+            final Integer[] icons = new Integer[]{R.drawable.ic_add_person_dark,
+                    R.drawable.ic_delete_person_dark};
 
             ListAdapter adapter = new ArrayAdapterWithIcon(getActivity(), items, icons);
 
@@ -225,8 +226,8 @@ public class ContactsFragment extends ListFragment {
             getListView().setItemChecked(mPosition, true);
             final String[] items = new String[]{getString(R.string.send_message),
                     getString(R.string.delete_contact)};
-            final Integer[] icons = new Integer[]{R.drawable.ic_action_email_dark,
-                    R.drawable.ic_action_discard};
+            final Integer[] icons = new Integer[]{R.drawable.ic_message_dark,
+                    R.drawable.ic_delete_person_dark};
 
             ListAdapter adapter = new ArrayAdapterWithIcon(getActivity(), items, icons);
 
@@ -329,41 +330,57 @@ public class ContactsFragment extends ListFragment {
 
     private void delete() {
 
-        mProgressDialog.show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getString(R.string.are_you_sure))
+                .setMessage(getString(R.string.delete_contact_confirmation))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.yes_button), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
 
-    if (mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
-            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        Toast.makeText(getActivity(),
-                                getString(R.string.contact_deleted),
-                                Toast.LENGTH_SHORT).show();
-                    } else if (e != null) {
-                        Toast.makeText(getActivity(),
-                                getString(R.string.delete_contact_failed),
-                                Toast.LENGTH_SHORT).show();
-                        getListView().setItemChecked(mPosition, true);
+                        mProgressDialog.show();
+                        if (mContacts.get(mPosition).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+                            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e == null) {
+                                        Toast.makeText(getActivity(),
+                                                getString(R.string.contact_deleted),
+                                                Toast.LENGTH_SHORT).show();
+                                    } else if (e != null) {
+                                        Toast.makeText(getActivity(),
+                                                getString(R.string.delete_contact_failed),
+                                                Toast.LENGTH_SHORT).show();
+                                        getListView().setItemChecked(mPosition, true);
+                                    }
+                                }
+                            });
+                        } else {
+                            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e == null) {
+                                        Toast.makeText(getActivity(),
+                                                getString(R.string.request_deleted),
+                                                Toast.LENGTH_SHORT).show();
+                                    } else if (e != null) {
+                                        Toast.makeText(getActivity(),
+                                                getString(R.string.delete_request_failed),
+                                                Toast.LENGTH_SHORT).show();
+                                        getListView().setItemChecked(mPosition, true);
+                                    }
+                                }
+                            });
+                        }
                     }
-                }
-            });
-        } else {
-            mContacts.get(mPosition).deleteInBackground(new DeleteCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        Toast.makeText(getActivity(),
-                                getString(R.string.request_deleted),
-                                Toast.LENGTH_SHORT).show();
-                    } else if (e != null) {
-                        Toast.makeText(getActivity(),
-                                getString(R.string.delete_request_failed),
-                                Toast.LENGTH_SHORT).show();
-                        getListView().setItemChecked(mPosition, true);
-                    }
-                }
-            });
-        }
+                })
+                .setNegativeButton(getString(R.string.no_button),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, int id) {
+                                return;
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
 
         mProgressDialog.dismiss();
 

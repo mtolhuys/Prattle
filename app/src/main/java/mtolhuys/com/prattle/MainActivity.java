@@ -11,9 +11,11 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,6 +45,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public static final String TAG = MainActivity.class.getSimpleName();
 
     protected String mCurrentUserName;
+    protected ShareActionProvider mActionProvider;
 
     public static final int TAKE_PHOTO_REQUEST = 0;
     public static final int PICK_PHOTO_REQUEST = 1;
@@ -254,7 +257,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -282,8 +286,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             case R.id.action_camera:
                 final String[] items = new String[]{getString(R.string.camera_label),
                                                     getString(R.string.gallery_label)};
-                final Integer[] icons = new Integer[]{R.drawable.ic_action_camera_dark,
-                                                      R.drawable.ic_action_collection};
+                final Integer[] icons = new Integer[]{R.drawable.ic_camera_fill_dark,
+                                                      R.drawable.ic_gallery_fill_dark};
                 ListAdapter adapter = new ArrayAdapterWithIcon(this, items, icons);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);

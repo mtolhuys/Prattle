@@ -40,6 +40,13 @@ public class MessageAdapter extends ArrayAdapter<ParseObject> {
             holder = (ViewHolder) convertView.getTag();
         }
 
+            ParseObject message = mMessages.get(position);
+
+        if (message.getString(ParseConstants.KEY_FILE_TYPE).equals(ParseConstants.TYPE_IMAGE)) {
+            holder.iconImageView.setImageResource(R.drawable.ic_gallery_fill_dark);
+            holder.nameLabel.setText(message.getString(ParseConstants.KEY_SENDER_NAME));
+        }
+
         return convertView;
     }
 
