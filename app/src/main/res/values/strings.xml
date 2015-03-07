@@ -51,7 +51,6 @@
     <string name="no_contacts">Add contacts to begin!</string>
     <string name="account_delete_success">Account successfully deleted!</string>
     <string name="account_delete_failed">Deleting account failed</string>
-    <string name="search_contacts">Back</string>
     <string name="search">Search</string>
 
     <string-array name="camera_choices">
@@ -96,5 +95,7 @@
     <string name="added_contact">Added Contact!</string>
     <string name="adding_contact_failed">Adding Contact Failed</string>
     <string name="menu_button">Menu</string>
+    <string name="title_activity_view_image">Prattle</string>
+    <string name="search_contacts">Search</string>
 
 </resources>

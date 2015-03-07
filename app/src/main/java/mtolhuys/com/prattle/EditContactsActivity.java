@@ -131,18 +131,7 @@ public class EditContactsActivity extends ListActivity {
 
                 mProgressBar.setVisibility(View.INVISIBLE);
 
-                if (searchItem.isEmpty()) {
-                    AlertDialogs.noSearchItemAlert(EditContactsActivity.this);
-                }
-                else if (users.isEmpty() && searchItem.equals(mCurrentUserName)) {
-                    AlertDialogs.sameAsSearchItemAlert(EditContactsActivity.this);
-                    setListAdapter(null);
-                }
-                else if (users.isEmpty() && !searchItem.equals(mCurrentUserName)) {
-                    mNoResult.setVisibility(View.VISIBLE);
-                    setListAdapter(null);
-                }
-                else if (e == null) {
+                if (e == null) {
                     mUsers = users;
                     String[] usernames = new String[mUsers.size()];
                     int i = 0;
