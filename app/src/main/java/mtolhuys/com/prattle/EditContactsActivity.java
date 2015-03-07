@@ -122,7 +122,7 @@ public class EditContactsActivity extends ListActivity {
 
         ParseUser.getQuery()
                 .setLimit(1000)
-                .orderByAscending(ParseConstants.KEY_USERNAME)
+                .orderByAscending(ParseConstants.KEY_SEARCH_NAME)
                 .whereContains(ParseConstants.KEY_SEARCH_NAME, searchItem)
                 .whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUserName)
                 .findInBackground(new FindCallback<ParseUser>() {

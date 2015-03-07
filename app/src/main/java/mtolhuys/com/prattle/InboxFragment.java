@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -27,6 +28,7 @@ public class InboxFragment extends ListFragment {
     public static final String TAG = InboxFragment.class.getSimpleName();
 
     protected List<ParseObject> mMessages;
+    protected ListView mListView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,10 +42,7 @@ public class InboxFragment extends ListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (ParseUser.getCurrentUser() == null) {
-            goToLogin();
-        }
-
+        mListView = getListView();
     }
 
     @Override
@@ -53,7 +52,6 @@ public class InboxFragment extends ListFragment {
         if (ParseUser.getCurrentUser() == null) {
             goToLogin();
         }
-
         updateList();
     }
 
@@ -75,7 +73,11 @@ public class InboxFragment extends ListFragment {
                         usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
                         i++;
                     }
-                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                    MessageAdapter adapter = new MessageAdapter(mListView.getContext(), mMessages);
+//                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+//                            getListView().getContext(),
+//                            android.R.layout.simple_list_item_1,
+//                            usernames);
                     setListAdapter(adapter);
                 }
             }
