@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.parse.FindCallback;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -26,12 +27,11 @@ public class ChatActivity extends ActionBarActivity {
     private static final String TAG = ChatActivity.class.getSimpleName();
 
     public static final String USER_ID_KEY = "userId";
-    private static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
 
     private Handler handler = new Handler();
 
-    private static String sUserId;
-    private static String sUserName;
+    private static String sMyId;
+    private static String sMyName;
     private static String sContactId;
     private static String sContactName;
 
@@ -60,11 +60,12 @@ public class ChatActivity extends ActionBarActivity {
     }
 
     private void startChat() {
-        sUserId = ParseUser.getCurrentUser().getObjectId();
-        sUserName = ParseUser.getCurrentUser().getUsername();
+        sMyId = ParseUser.getCurrentUser().getObjectId();
+        sMyName = ParseUser.getCurrentUser().getUsername();
         sContactId = getIntent().getStringExtra("contactId");
         sContactName = getIntent().getStringExtra("contactName");
         setupMessagePosting();
+        receiveMessage();
     }
 
     // Defines a runnable which is run every 100ms
@@ -86,7 +87,7 @@ public class ChatActivity extends ActionBarActivity {
         btSend = (Button) findViewById(R.id.btSend);
         lvChat = (ListView) findViewById(R.id.lvChat);
         mMessages = new ArrayList<Message>();
-        mAdapter = new ChatListAdapter(ChatActivity.this, sUserId, mMessages);
+        mAdapter = new ChatListAdapter(ChatActivity.this, sMyId, mMessages);
         lvChat.setAdapter(mAdapter);
         btSend.setOnClickListener(new View.OnClickListener() {
 
@@ -95,7 +96,10 @@ public class ChatActivity extends ActionBarActivity {
                 String body = etMessage.getText().toString();
                 // Use Message model to create new messages now
                 Message message = new Message();
-                message.setUserId(sUserId);
+                message.setSenderId(sMyId);
+                message.setSenderName(sMyName);
+                message.setRecipientId(sContactId);
+                message.setRecipientName(sContactName);
                 message.setBody(body);
                 message.saveInBackground(new SaveCallback() {
                     @Override
@@ -110,14 +114,23 @@ public class ChatActivity extends ActionBarActivity {
 
     // Query messages from Parse so we can load them into the chat adapter
     private void receiveMessage() {
-        // Construct query to execute
-        ParseQuery<Message> query = ParseQuery.getQuery(Message.class);
+        ParseQuery<Message> toMe = ParseQuery.getQuery(Message.class);
+        ParseQuery<Message> toYou = ParseQuery.getQuery(Message.class);
         // Configure limit and sort order
-        query.setLimit(MAX_CHAT_MESSAGES_TO_SHOW);
-        query.orderByAscending("createdAt");
+        toMe.whereEqualTo(ParseConstants.KEY_SENDER_ID, sContactId);
+        toMe.whereEqualTo(ParseConstants.KEY_RECIPIENT_ID, sMyId);
+        toYou.whereEqualTo(ParseConstants.KEY_SENDER_ID, sMyId);
+        toYou.whereEqualTo(ParseConstants.KEY_RECIPIENT_ID, sContactId);
+        // Construct query to execute
+        List<ParseQuery<Message>> combined = new ArrayList<ParseQuery<Message>>();
+        combined.add(toMe);
+        combined.add(toYou);
+        ParseQuery<Message> chat = ParseQuery.or(combined);
+        chat.setLimit(ParseConstants.MAX_CHAT_MESSAGES_TO_SHOW);
+        chat.orderByAscending(ParseConstants.KEY_CREATED_AT);
         // Execute query to fetch all messages from Parse asynchronously
         // This is equivalent to a SELECT query with SQL
-        query.findInBackground(new FindCallback<Message>() {
+        chat.findInBackground(new FindCallback<Message>() {
             @Override
             public void done(List<Message> messages, com.parse.ParseException e) {
                 if (e == null) {

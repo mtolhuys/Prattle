@@ -9,7 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
 import java.math.BigInteger;
@@ -22,7 +21,6 @@ import java.util.List;
 public class ChatListAdapter extends ArrayAdapter<Message> {
 
     private String mUserId;
-    private boolean isMe;
 
     public ChatListAdapter(Context context, String userId, List<Message> messages) {
         super(context, 0, messages);
@@ -42,9 +40,8 @@ public class ChatListAdapter extends ArrayAdapter<Message> {
         }
         final Message message = (Message)getItem(position);
         final ViewHolder holder = (ViewHolder)convertView.getTag();
-        if (message != null) {
-            isMe = message.getUserId().equals(mUserId);
-        }
+        final boolean isMe = message.getSenderId().equals(mUserId);
+
         // Show-hide image based on the logged-in user.
         // Display the profile image to the right for our user, left for other users.
         if (isMe) {
@@ -57,7 +54,7 @@ public class ChatListAdapter extends ArrayAdapter<Message> {
             holder.body.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
         }
         final ImageView profileView = isMe ? holder.imageRight : holder.imageLeft;
-        Picasso.with(getContext()).load(getProfileUrl(message.getUserId())).into(profileView);
+        Picasso.with(getContext()).load(getProfileUrl(message.getSenderId())).into(profileView);
         holder.body.setText(message.getBody());
         return convertView;
     }

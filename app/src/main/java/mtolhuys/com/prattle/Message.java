@@ -1,5 +1,6 @@
 package mtolhuys.com.prattle;
 
+import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
@@ -8,47 +9,48 @@ import com.parse.ParseObject;
  */
 @ParseClassName("Message")
 public class Message extends ParseObject {
-    public String getUserId() {
-        return getString("userId");
-    }
 
     // GETTERS
 
-    public String getUserName() {
-        return getString("userName");
+    public String getSenderId() {
+        return getString(ParseConstants.KEY_SENDER_ID);
     }
 
-    public String getContactId() {
-        return getString("contactId");
+    public String getSenderName() {
+        return getString(ParseConstants.KEY_SENDER_NAME);
     }
 
-    public String getContactName() {
-        return getString("contactName");
+    public String getRecipientId() {
+        return getString(ParseConstants.KEY_RECIPIENT_ID);
+    }
+
+    public String getRecipientName() {
+        return getString(ParseConstants.KEY_RECIPIENT_NAME);
     }
 
     public String getBody() {
-        return getString("body");
+        return getString(ParseConstants.MESSAGE_BODY);
     }
 
     // SETTERS
 
-    public void setUserId(String userId) {
-        put("userId", userId);
+    public void setSenderId(String userId) {
+        put(ParseConstants.KEY_SENDER_ID, userId);
     }
 
-    public void setUserName(String userName) {
-        put("userName", userName);
+    public void setSenderName(String userName) {
+        put(ParseConstants.KEY_SENDER_NAME, userName);
     }
 
-    public void setContactId(String contactId) {
-        put("contactId", contactId);
+    public void setRecipientId(String contactId) {
+        put(ParseConstants.KEY_RECIPIENT_ID, contactId);
     }
 
-    public void setContactName(String contactName) {
-        put("contactName", contactName);
+    public void setRecipientName(String contactName) {
+        put(ParseConstants.KEY_RECIPIENT_NAME, contactName);
     }
 
     public void setBody(String body) {
-        put("body", body);
+        put(ParseConstants.MESSAGE_BODY, body);
     }
 }

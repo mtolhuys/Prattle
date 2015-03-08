@@ -25,5 +25,7 @@ public final class ParseConstants {
     public static final String KEY_CREATED_AT = "createdAt";
 
     // Miscellaneous values
+    public static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
+    public static final String MESSAGE_BODY = "body";
     public static final String TYPE_IMAGE = "image";
 }
