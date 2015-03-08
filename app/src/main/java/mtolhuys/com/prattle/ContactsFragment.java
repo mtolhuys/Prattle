@@ -266,7 +266,7 @@ public class ContactsFragment extends ListFragment {
                 public void onClick(DialogInterface dialog, int which) {
                     switch (which) {
                         case 0: // Send Message
-
+                            Chat();
                             break;
                         case 1: // Delete Contact
                             delete();
@@ -275,6 +275,13 @@ public class ContactsFragment extends ListFragment {
                     }
                 }
             };
+
+    private void Chat() {
+        Intent intent = new Intent(getActivity(), ChatActivity.class);
+        intent.putExtra("contactId", mContactIds.get(mPosition));
+        intent.putExtra("contactName", mContactNames.get(mPosition));
+        startActivity(intent);
+    }
 
     private void addContact() {
 

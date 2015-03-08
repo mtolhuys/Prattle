@@ -59,8 +59,9 @@ public class InboxFragment extends ListFragment {
 
     private void updateList() {
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(ParseConstants.CLASS_MESSAGES);
-        query.whereEqualTo(ParseConstants.KEY_RECIPIENT_ID, ParseUser.getCurrentUser().getObjectId());
-        query.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
+        query.whereContains(ParseConstants.KEY_RECIPIENT_ID, ParseUser.getCurrentUser().getObjectId());
+        query.whereContains(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
+        query.orderByDescending(ParseConstants.KEY_CREATED_AT);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> messages, ParseException e) {
@@ -72,34 +73,43 @@ public class InboxFragment extends ListFragment {
                     String[] usernames = new String[mMessages.size()];
                     int i = 0;
                     for (ParseObject message : mMessages) {
-                        usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
+                        if (message.getString(ParseConstants.KEY_RECIPIENT_NAME)
+                                .equals(ParseUser.getCurrentUser().getUsername())) {
+                            usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
+                        } else {
+                            usernames[i] = message.getString(ParseConstants.KEY_RECIPIENT_NAME);
+                        }
                         i++;
                     }
-                    MessageAdapter adapter = new MessageAdapter(mListView.getContext(), mMessages);
+                    //MessageAdapter adapter = new MessageAdapter(mListView.getContext(), mMessages);
+                    ArrayAdapter adapter = new ArrayAdapter<>(
+                            getListView().getContext(),
+                            android.R.layout.simple_list_item_1,
+                            usernames);
                     setListAdapter(adapter);
                 }
             }
         });
     }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        ParseObject message = mMessages.get(position);
-        String messageType = message.getString(ParseConstants.KEY_FILE_TYPE);
-        ParseFile file = message.getParseFile(ParseConstants.KEY_FILE);
-        Uri fileUri = Uri.parse(file.getUrl());
-
-        if (messageType.equals(ParseConstants.TYPE_IMAGE)) {
-            Intent intent = new Intent(getActivity(), ViewImageActivity.class);
-            intent.setData(fileUri);
-            startActivity(intent);
-        }
-        else {
-
-        }
-    }
+//    @Override
+//    public void onListItemClick(ListView l, View v, int position, long id) {
+//        super.onListItemClick(l, v, position, id);
+//
+//        ParseObject message = mMessages.get(position);
+//        String messageType = message.getString(ParseConstants.KEY_FILE_TYPE);
+//        ParseFile file = message.getParseFile(ParseConstants.KEY_FILE);
+//        Uri fileUri = Uri.parse(file.getUrl());
+//
+//        if (messageType.equals(ParseConstants.TYPE_IMAGE)) {
+//            Intent intent = new Intent(getActivity(), ViewImageActivity.class);
+//            intent.setData(fileUri);
+//            startActivity(intent);
+//        }
+//        else {
+//
+//        }
+//    }
 
     private void goToLogin() {
         Intent intent = new Intent(getActivity(), LoginActivity.class);

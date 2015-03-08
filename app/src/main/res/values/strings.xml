@@ -97,5 +97,9 @@
     <string name="menu_button">Menu</string>
     <string name="title_activity_view_image">Prattle</string>
     <string name="search_contacts">Search</string>
+    <string name="title_activity_chat">ChatActivity</string>
+    <string name="send">Send</string>
+    <string name="profile_other">Contact</string>
+    <string name="profile_me">Me</string>
 
 </resources>
