@@ -73,6 +73,7 @@ public class SignUpActivity extends ActionBarActivity {
                     ParseUser newUser = new ParseUser();
                     newUser.setUsername(username);
                     newUser.setPassword(password);
+                    newUser.put(ParseConstants.KEY_SEARCH_NAME, username.toLowerCase());
                     newUser.setEmail(email);
                     newUser.signUpInBackground(new SignUpCallback() {
                         @Override

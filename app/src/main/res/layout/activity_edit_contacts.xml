@@ -29,7 +29,7 @@
         android:imeOptions="actionSearch"
         android:inputType="textPersonName"
         android:singleLine="true"
-        android:hint="@string/search_field_hint"
+        android:hint="@string/search"
         android:ems="10"
         android:id="@+id/searchUser"
         android:layout_alignParentTop="true"

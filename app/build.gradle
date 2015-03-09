@@ -25,4 +25,5 @@ dependencies {
     compile 'com.parse.bolts:bolts-android:1.+'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'uk.co.chrisjenx:calligraphy:2.0.1'
+    compile 'com.squareup.picasso:picasso:2.5.0'
 }

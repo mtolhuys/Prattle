@@ -17,6 +17,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewConfiguration;
 import android.widget.ListAdapter;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -41,8 +43,6 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
-
-    protected String mCurrentUserName;
 
     public static final int TAKE_PHOTO_REQUEST = 0;
     public static final int PICK_PHOTO_REQUEST = 1;
@@ -172,6 +172,17 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             Log.i(TAG, ParseUser.getCurrentUser().getUsername());
         }
 
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if(menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception ex) {
+            // Ignore
+        }
+
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -254,19 +265,20 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
+        // automatically handle clicks on the Home/Up button_right, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         switch (id) {
             case R.id.action_logout:
-                ParseUser.logOut();
+                logout();
                 goToLogin();
                 break;
 
@@ -282,8 +294,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             case R.id.action_camera:
                 final String[] items = new String[]{getString(R.string.camera_label),
                                                     getString(R.string.gallery_label)};
-                final Integer[] icons = new Integer[]{R.drawable.ic_action_camera_dark,
-                                                      R.drawable.ic_action_collection};
+                final Integer[] icons = new Integer[]{R.drawable.ic_camera_fill_dark,
+                                                      R.drawable.ic_gallery_fill_dark};
                 ListAdapter adapter = new ArrayAdapterWithIcon(this, items, icons);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -310,7 +322,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             .setCancelable(false)
             .setPositiveButton(getString(R.string.yes_button), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    // if this button is clicked, close
+                    // if this button_right is clicked, close
                     // current activity
                     deleteAccountContactsAndRequests();
                     ParseUser.logOut();
@@ -318,7 +330,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             })
             .setNegativeButton(getString(R.string.no_button), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    // if this button is clicked, just close
+                    // if this button_right is clicked, just close
                     // the dialog box and do nothing
                     dialog.cancel();
                 }
@@ -341,6 +353,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    }
+
+    private void logout(){
+        ParseUser.logOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        this.finish();
     }
 
     private void deleteAccountContactsAndRequests() {

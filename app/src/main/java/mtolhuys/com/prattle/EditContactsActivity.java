@@ -44,7 +44,6 @@ public class EditContactsActivity extends ListActivity {
     protected ParseRelation<ParseUser> mContactRelation;
     protected ParseUser mCurrentUser;
     protected ParseObject mContact;
-    protected ParseObject mRequest;
     protected ProgressBar mProgressBar;
     protected ProgressDialog mProgressDialog;
     protected EditText mSearchField;
@@ -90,7 +89,7 @@ public class EditContactsActivity extends ListActivity {
         mSearchField = (EditText) findViewById(R.id.searchUser);
         mSearchButton = (ImageButton) findViewById(R.id.searchButton);
 
-        mSearchField.setImeActionLabel(getString(R.string.search_key_label), KeyEvent.KEYCODE_ENTER);
+        mSearchField.setImeActionLabel(getString(R.string.search), KeyEvent.KEYCODE_ENTER);
         mSearchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -113,37 +112,26 @@ public class EditContactsActivity extends ListActivity {
 
     }
 
-    private void updateList() {
+    private void search() {
         mProgressBar.setVisibility(View.VISIBLE);
         mNoResult.setVisibility(View.INVISIBLE);
 
         mProgressDialog.show();
 
-        final String searchItem = mSearchField.getText().toString().trim();
+        final String searchItem = mSearchField.getText().toString().trim().toLowerCase();
 
-        final ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.orderByAscending(ParseConstants.KEY_USERNAME);
-        query.setLimit(1000);
-        query.whereContains(ParseConstants.KEY_USERNAME, searchItem);
-        query.whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUserName);
-        query.findInBackground(new FindCallback<ParseUser>() {
+        ParseUser.getQuery()
+                .setLimit(1000)
+                .orderByAscending(ParseConstants.KEY_SEARCH_NAME)
+                .whereContains(ParseConstants.KEY_SEARCH_NAME, searchItem)
+                .whereNotEqualTo(ParseConstants.KEY_USERNAME, mCurrentUserName)
+                .findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
 
                 mProgressBar.setVisibility(View.INVISIBLE);
 
-                if (searchItem.isEmpty()) {
-                    AlertDialogs.noSearchItemAlert(EditContactsActivity.this);
-                }
-                else if (users.isEmpty() && searchItem.equals(mCurrentUserName)) {
-                    AlertDialogs.sameAsSearchItemAlert(EditContactsActivity.this);
-                    setListAdapter(null);
-                }
-                else if (users.isEmpty() && !searchItem.equals(mCurrentUserName)) {
-                    mNoResult.setVisibility(View.VISIBLE);
-                    setListAdapter(null);
-                }
-                else if (e == null) {
+                if (e == null) {
                     mUsers = users;
                     String[] usernames = new String[mUsers.size()];
                     int i = 0;
@@ -156,7 +144,14 @@ public class EditContactsActivity extends ListActivity {
                             android.R.layout.simple_list_item_checked,
                             usernames);
                     setListAdapter(mAdapter);
-                    addContactCheckmarks();
+                    // Add Contact Checkmarks
+                    for (i = 0; i < mUsers.size(); i++) {
+                        if (mContactIds != null) {
+                            if (Arrays.asList(mContactIds).contains(mUsers.get(i).getObjectId())) {
+                                getListView().setItemChecked(i, true);
+                            }
+                        }
+                    }
                 } else {
                     Log.e(TAG, e.getMessage());
                     exceptionErrorAlert(e);
@@ -173,13 +168,11 @@ public class EditContactsActivity extends ListActivity {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    private void addContactCheckmarks() {
+    private void updateList() {
 
         ParseQuery contactQuery = ParseQuery.getQuery(ParseConstants.CLASS_CONTACTS);
         contactQuery.setLimit(1000);
-        contactQuery.orderByAscending(ParseConstants.KEY_SENDER_NAME);
         contactQuery.whereEqualTo(ParseConstants.KEY_USERS_IDS, ParseUser.getCurrentUser().getObjectId());
-
         contactQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> contacts, ParseException e) {
@@ -187,39 +180,22 @@ public class EditContactsActivity extends ListActivity {
 
                     mContacts = contacts;
 
-                    if (contacts.size() > 0) {
-
-                    String[] userIds = new String[mUsers.size()];
                     mContactIds = new String[mContacts.size()];
 
-                        for (int i = 0; i < mContacts.size(); i++) {
-                            mContact = mContacts.get(i);
+                    for (int i = 0; i < mContacts.size(); i++) {
+                        mContact = mContacts.get(i);
 
-                            if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
-                                    .equals(mCurrentUserId)) {
-                                mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
-                            }
-                            if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(1)
-                                    .equals(mCurrentUserId)) {
-                                mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
-                            }
+                        if (mContact.getList(ParseConstants.KEY_USERS_IDS).get(0)
+                                .equals(mCurrentUserId)) {
+                            mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(1).toString();
+                        } else {
+                            mContactIds[i] = mContact.getList(ParseConstants.KEY_USERS_IDS).get(0).toString();
                         }
-
-                        for (int i = 0; i < mUsers.size(); i++) {
-                            userIds[i] = mUsers.get(i).getObjectId();
-                        }
-                        int i = 0;
-                        for (String user : userIds) {
-                            if (Arrays.asList(mContactIds).contains(user)) {
-                                getListView().setItemChecked(i, true);
-                            }
-                            i++;
-                        }
-
                     }
+                    search();
                 }
-                else if (e != null) {
-                    Log.e(TAG, e.getMessage());
+                else {
+                    search();
                 }
             }
         });
@@ -253,13 +229,13 @@ public class EditContactsActivity extends ListActivity {
                                 public void done(ParseException e) {
                                     if (e == null) {
                                         Toast.makeText(EditContactsActivity.this,
-                                                "Contact Request Sent",
+                                                getString(R.string.request_sent),
                                                 Toast.LENGTH_SHORT).show();
                                         updateList();
                                     }
                                     else {
                                         Toast.makeText(EditContactsActivity.this,
-                                                "Contact Request Failed",
+                                                getString(R.string.request_sent_failed),
                                                 Toast.LENGTH_SHORT).show();
                                         mProgressDialog.dismiss();
                                     }
@@ -286,6 +262,7 @@ public class EditContactsActivity extends ListActivity {
                         public void onClick(DialogInterface dialog, int id) {
                             mProgressDialog.show();
                             delete();
+                            updateList();
                             dialog.cancel();
                         }
                     })
@@ -303,54 +280,47 @@ public class EditContactsActivity extends ListActivity {
 
     private void delete() {
 
-        mProgressDialog.show();
+        String deleteId = mUsers.get(mPosition).getObjectId();
 
-        if (mRequest != null) {
-            if (mRequest.getList(ParseConstants.KEY_USERS_IDS)
-                    .contains(mUsers.get(mPosition).getObjectId())) {
-                mRequest.deleteInBackground(new DeleteCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            Toast.makeText(EditContactsActivity.this,
-                                    getString(R.string.request_deleted),
-                                    Toast.LENGTH_SHORT).show();
+        for (int i = 0; i < mContacts.size(); i++) {
+            if (Arrays.asList(mContactIds).get(i).contains(deleteId)) {
+                if (mContacts.get(i).getBoolean(ParseConstants.KEY_CONTACT_STATUS)) {
+                    mContacts.get(i).deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                Toast.makeText(EditContactsActivity.this,
+                                        getString(R.string.contact_deleted),
+                                        Toast.LENGTH_SHORT).show();
+                            } else if (e != null) {
+                                Toast.makeText(EditContactsActivity.this,
+                                        getString(R.string.delete_contact_failed),
+                                        Toast.LENGTH_SHORT).show();
+                                getListView().setItemChecked(mPosition, true);
+                            }
                         }
-                        else if (e != null) {
-                            Toast.makeText(EditContactsActivity.this,
-                                    getString(R.string.delete_request_failed),
-                                    Toast.LENGTH_SHORT).show();
-                            getListView().setItemChecked(mPosition, true);
+                    });
+                }
+                else {
+                    mContacts.get(i).deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                Toast.makeText(EditContactsActivity.this,
+                                        getString(R.string.request_deleted),
+                                        Toast.LENGTH_SHORT).show();
+                            } else if (e != null) {
+                                Toast.makeText(EditContactsActivity.this,
+                                        getString(R.string.delete_request_failed),
+                                        Toast.LENGTH_SHORT).show();
+                                getListView().setItemChecked(mPosition, true);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
-
-        if (mContact != null) {
-            if (mContact.getList(ParseConstants.KEY_USERS_IDS)
-                    .contains(mUsers.get(mPosition).getObjectId())) {
-                mContact.deleteInBackground(new DeleteCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            Toast.makeText(EditContactsActivity.this,
-                                    getString(R.string.contact_deleted),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        else if (e != null) {
-                            Toast.makeText(EditContactsActivity.this,
-                                    getString(R.string.delete_contact_failed),
-                                    Toast.LENGTH_SHORT).show();
-                            getListView().setItemChecked(mPosition, true);
-                        }
-                    }
-                });
-            }
-        }
-
         mProgressDialog.dismiss();
-
     }
 
     private void exceptionErrorAlert(ParseException e) {

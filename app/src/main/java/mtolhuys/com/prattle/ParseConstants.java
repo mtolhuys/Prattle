@@ -12,6 +12,7 @@ public final class ParseConstants {
 
     // Field Names
     public static final String KEY_USERNAME = "username";
+    public static final String KEY_SEARCH_NAME = "searchName";
     public static final String KEY_CONTACT_RELATION = "contactRelation";
     public static final String KEY_CONTACT_STATUS = "status";
     public static final String KEY_USERS_IDS = "usersIds";
@@ -24,5 +25,7 @@ public final class ParseConstants {
     public static final String KEY_CREATED_AT = "createdAt";
 
     // Miscellaneous values
+    public static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
+    public static final String MESSAGE_BODY = "body";
     public static final String TYPE_IMAGE = "image";
 }
